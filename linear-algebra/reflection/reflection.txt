@@ -1,0 +1,132 @@
+*********** Initialization/KETlib **********
+
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(plugindirectory);
+import("ketcindy.ini");
+
+Divisor(n):=(
+  regional(out,tmp);
+  out=[];
+  forall(1..(round(sqrt(n))),
+    if(mod(n,#)==0,
+      tmp=round(n/#);
+      out=concat(out,[#,tmp]));
+  );
+  out=sort(out);
+  out;
+);
+
+*********** Drow/figures **********
+
+Ketinit();
+Setparent(Cdyname()+"fig");
+Setketcindyjs(["Nolbl=all","Loc=n"]);//no ketjs
+
+Setwindow([-5,5],[-5,5]);
+
+//分数表示の分母のリスト
+dvtmp=pairs([1,2,3,4,5]);
+dvtmp=concat(dvtmp,apply(1..5,[#,#]));
+dvtmp=apply(dvtmp,#_1*#_2);
+dvL=remove(Divisor(mm^2+nn^2),[1]);
+forall(dvL,dv,
+  dvtmp=concat(dvtmp,apply(dvtmp,#*dv));
+);
+dvtmp=set(dvtmp);
+
+mm=3;
+nn=2;
+str="fr(3,2)";
+//str=Textedit(50);// only ketjs
+tmp=indexof(str,"=");
+if(tmp>0,
+  str=substring(str,tmp,length(str));
+);
+if(length(str)>0,
+  tmp=Tocindyform(str);
+  tmp=Strsplit(tmp,"/");
+  tmp=apply(tmp,parse(#));
+  mm=round(tmp_1); nn=1;
+  if(length(tmp)==2,
+    nn=tmp_2;
+  );
+//  texm=Totexform(str);
+  texm=mm/nn;
+  texm=Totexform(Op(1,Fracform(texm,dvtmp)));
+
+aaa=mm/nn;
+if(5/aaa<5 & -5<5/aaa,
+tmp1=[5/aaa,4.8];
+,
+aah=min([5,aaa*5]);
+tmp1=[5,aah];
+);
+
+  tmp2=["Size=1.5"];
+  if(nn==1,
+    if(mm==0,
+      Expr([5,0.5],"ne","y=0",tmp2);
+    ,
+    );
+    if(mm==1,
+      Expr(tmp1,"nw","y=x",tmp2);
+    ,
+    );
+    if(mm==-1,
+      Expr(tmp1,"ne","y=-x",tmp2);
+    ,
+    );
+    if(1<mm % mm<-1,
+      Expr(tmp1,"nw","y="+text(mm)+"x",tmp2);
+    ,
+    );
+  ,
+    Expr(tmp1,"ne","\displaystyle y=\!"+texm+"\; x",tmp2);
+  );
+);
+fun=Assign("m/n*x",["m",mm,"n",nn]);
+Plotdata("1",fun,"x=[-5,5]",["Num=1"]);
+
+tmp=remove((-4)..4,[0]);
+tmp=apply(tmp,[#,text(#)]);
+tmp=flatten(tmp);
+Htickmark(tmp);
+Vtickmark(tmp);
+
+Putpoint("P",[3,3],[P.x,P.y]);
+
+FP=apply(P.xy,Op(1,Fracform(#,5)));
+CP=apply(FP,Tocindyform(#));
+PP=apply(CP,parse(#));
+x1=PP_1; y1=PP_2;
+m=mm/nn;
+x2=(2*m*y1+(1-m^2)*x1)/(m^2+1);
+y2=((m^2-1)*y1+2*m*x1)/(m^2+1);
+PQ=[x2,y2];
+
+GP=apply(FP,Totexform(#));
+GQ=apply(PQ,Totexform(Op(1,Fracform(#,dvtmp))));
+//texm=Totexform(Op(1,Fracform(texm,tmp)))
+//println(Fracform(texmf,tmp));
+
+Pointdata("P",PP,["Size=3"]);
+Pointdata("Q",PQ,["Size=3"]);
+Listplot("1",[PP,PQ]);
+PM=(PP+PQ)/2;
+Pointdata("i",PM,["Size=3","Color=blue"]);
+Segmark("1",[PP,PM],["Type=2"]); 
+Segmark("2",[PQ,PM],["Type=2"]); 
+
+TGP="\mathrm{P}\displaystyle("+GP_1+","+GP_2+")";
+TGQ="\mathrm{Q}\displaystyle("+GQ_1+","+GQ_2+")";
+
+if(PP_2<=PQ_2,
+  dP="n2e2"; dQ="n2w2";
+,
+  dP="n2w"; dQ="s2w";
+);
+Expr([PP,dP,TGP,PQ,dQ,TGQ],["Size=1.6"]);
+
+Figpdf([10,10,10,10,[0,0]]);
+Windispg();

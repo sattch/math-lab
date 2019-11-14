@@ -1,0 +1,46 @@
+********** Initialization/KETlib **********
+
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(plugindirectory);
+import("ketcindy.ini");
+
+********** Draw/figures **********
+
+Ketinit();
+Setparent(Cdyname()+"fig");
+Setketcindyjs(["Nolabel=all","Local=y"]);//no ketjs
+
+Setwindow([-2,2],[-1,4]);
+hL=remove((-2)..2,[0]);
+vL=remove((-1)..4,[0]);
+forall(hL,
+  Listplot("xdo"+text(#+3),[[#,YMIN],[#,YMAX]],["do"]);
+);
+forall(vL,
+  Listplot("ydo"+text(#+3),[[XMIN,#],[XMAX,#]],["do"]);
+);
+tmp1=apply(hL,[#,text(#)]);
+tmp2=flatten(tmp1);
+Htickmark(tmp2);
+tmp1=apply(vL,[#,text(#)]);
+tmp2=flatten(tmp1);
+Vtickmark(tmp2);
+
+mf(s):=(
+  regional(tmp,m);
+  tmp=Assign("s^x",["s",s]);
+  Plotdata("1",tmp,"x=[XMIN,log(4)/log("+text(s)+")]");
+  Expr([log(4)/log(s),4],"n","y="+text(format(s,2))+"^x");
+  m=Derivative("gr1","x=0");
+  tmp=Assign("m*x+1",["m",m]);
+  Plotdata("2",tmp,"x",["Num=1","Color=blue"]);
+  Setcolor("blue");
+    Expr([2,m*2+1],"e","y="+text(format(m,2))+"x+1");
+  Setcolor("black");
+);
+ss=Animationparam(2,0.05,[2,3]);//初期値，スピード，sの範囲
+mf(ss);
+
+Figpdf();
+Windispg();

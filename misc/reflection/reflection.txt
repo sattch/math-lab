@@ -22,6 +22,7 @@ Divisor(n):=(
 Ketinit();
 Setparent(Cdyname()+"fig");
 Setketcindyjs(["Nolbl=all","Loc=n"]);//no ketjs
+Ketcindyjsbody(["<p,f10>_;対称移動"],[]); 
 
 Setwindow([-5,5],[-5,5]);
 

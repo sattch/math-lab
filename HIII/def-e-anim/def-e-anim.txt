@@ -1,15 +1,6 @@
-********** Initialization/KETlib **********
-
-use("KetCindyPlugin");
-Dircdy=loaddirectory;
-setdirectory(plugindirectory);
-import("ketcindy.ini");
-
-********** Draw/figures **********
-
 Ketinit();
-Setparent(Cdyname()+"fig");
 Setketcindyjs(["Nolabel=all","Local=y"]);//no ketjs
+Ketcindyjsbody(["<p,f10>_;ネピアの数eの定義（アニメーション）"],[]);
 
 Setwindow([-2,2],[-1,4]);
 hL=remove((-2)..2,[0]);
@@ -42,5 +33,4 @@ mf(s):=(
 ss=Animationparam(2,0.05,[2,3]);//初期値，スピード，sの範囲
 mf(ss);
 
-Figpdf();
 Windispg();

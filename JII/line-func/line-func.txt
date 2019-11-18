@@ -1,0 +1,34 @@
+Ketinit();
+Setketcindyjs(["Nol=all","Color=offwhite"]);
+Ketcindyjsbody(["<p,f10>_;Tenkey"],[]);
+
+pLB=[7,0];
+pLR=Tenkeybrd(pLB,["Shade=n"]); // no ketjs
+//pLR=Tenkeybrd(pLB,["Shade=y"]);// only ketjs
+
+if(getkeyflg==1,
+  Endflg=Keyaction(Key);
+  getkeyflg=0;
+);
+
+if(Endflg==1,
+ if(ctr==0,aa=Tenkeys);
+ if(ctr==1,bb=Tenkeys);
+ ctr=mod(ctr+1,2);
+ Tenkeys="";
+ Endflg=0;
+);
+
+Expr(pLB+[0,4.4],"e",Tenkeys,["Size=1.5","notex"]);
+if(ctr==0,Expr(pLB+[-0.1,4.4],"w","a=",["Size=1.4","notex"]));
+if(ctr==1,Expr(pLB+[-0.1,4.4],"w","b=",["Size=1.4","notex"]));
+
+Expr([7,-1],"e","a="+aa,["Size=1.5","notex"]);
+Expr([7,-2],"e","b="+bb,["Size=1.5","notex"]);
+
+if(length(aa)*length(bb)>0,
+ tmp1=parse(aa);
+ tmp2=parse(bb);
+ Lineplot("1",[[0,tmp2],[1,tmp1+tmp2]],["Color=red"]);
+);
+Windispg();

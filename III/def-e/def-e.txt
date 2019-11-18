@@ -1,0 +1,33 @@
+Ketinit();
+Setketcindyjs(["Nol=all","Fig=n","Size=1","Axe=n","Eq=","Color=offwhite"]);//no ketjs
+Ketcindyjsbody(["<p,f10>_;ネピアの数eの定義"],[]);
+Setwindow([-2,2],[-0.5,3.5]);//no ketjs
+Setax(["Size=1.5","a0.5"]);
+Slider("A",[-2+0.1,-1],[2,-1]);
+A.size=5;
+
+str="2";
+//str=Textedit(60); //only ketjs
+if(length(str)>0,
+  aa=parse(str);
+  Ptpos(A,[aa-2,-1]);
+,
+  aa=Ptpos(A)_1+2;
+);
+Defvar("aa",aa);//no ketjs
+
+Expr([-3,3.1],"w","a=",["Size=1.4","notex"]);
+Movetojs(60,[-3,3],14);//no ketjs
+Expr(Ptpos(A)+[0,0.1],"n","a="+format(aa,10),["Size=1.5"]);
+Plotdata("1","aa^x","x",["Num=200"]);
+Plotdata("2","log(aa)*x+1","x",["Num=1","Color=red"]);
+Listplot("1",[[1,0],[1,log(aa)+1],[0,log(aa)+1]],["Color=blue"]);
+Pointdata("1",[1,2],["Size=2","Color=blue"]);
+Htickmark([1,"ne","1"],["Size=1.4"]);
+Vtickmark([1,"1",2,"ne","2"],["Size=1.4"]);
+Vtickmark([log(aa)+1,Sprintf(log(aa)+1,10)],["Size=1.5"]);
+Expr([log(3.5)/log(aa),3.5],"se","y=a^x",["Size=1.5"]);
+
+ss=Animationparam(pi/6,2,[0,2*pi+pi/6]);
+
+Windispg();

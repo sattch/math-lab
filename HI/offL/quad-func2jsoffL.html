@@ -231,6 +231,9 @@ Strictmove(pCorg,sep):=(
     );
   );
 );
+Addax(param):=(
+  ADDAXES=text(param);
+);
 Listplot(list):=Listplot(list,[]);
 Listplot(Arg1,Arg2):=(
   regional(name,list,options,str);
@@ -1142,9 +1145,6 @@ Replaceall(str,repL):=(
     out=replace(out,tmp1,tmp2);
   );
   out;
-);
-Addax(param):=(
-  ADDAXES=text(param);
 );
 Htickmark(arglist):=Htickmark(arglist,[]); //190203
 Htickmark(arglist,options):=( //190203
@@ -2178,7 +2178,6 @@ forall(remove(tmp,[0]),
  vtick=concat(vtick,[#,text(#)]);
 );
 Vtickmark(vtick,["Size=1.5"]);
-Addax(1);
 
 str1="1";
 str1=Textedit(51); //

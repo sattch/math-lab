@@ -1,8 +1,48 @@
+///////////// KETlib //////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(plugindirectory);
+import("ketcindy.ini");
+
+Ansform[str]:=(
+ regional(tmp,tmp1,tmp2,numL);
+ numL=apply(0..9,text(#));
+ numL=concat(numL,["+","-"]);
+ tmp1=0;
+ tmp2="";
+ if(length(str)>0,
+  tmp=substring(str,0,1);
+  if(contains(numL,tmp),
+   tmp1=parse(str);
+  ,
+   tmp1=Tocindyform(str);
+   tmp1=parse(tmp1);
+  );
+  tmp2=Fracform(tmp1,10);
+  tmp2=Totexform(tmp2_1);
+ );
+ [tmp1,tmp2];
+);
+
+Tenkeys="";
+Key="";
+getkeyflg=0;
+Endflg=0;
+gflag=0;
+
+aa="";
+bb="";
+ctr=0;
+
+//////////// Draw/Figures ///////////
 Ketinit();
 Setketcindyjs(["Nol=all","Color=offwhite"]);
-Ketcindyjsbody(["<p,f10>_;Tenkey"],[]);
+Ketcindyjsbody(["<p,f10>_;1次関数"],[]);
+Addax(0);
 
-pLB=[7,0];
+Slider("X",[XMIN,0],[XMAX,0]);
+
+pLB=[7,2];
 pLR=Tenkeybrd(pLB,["Shade=n"]); // no ketjs
 //pLR=Tenkeybrd(pLB,["Shade=y"]);// only ketjs
 
@@ -23,12 +63,36 @@ Expr(pLB+[0,4.4],"e",Tenkeys,["Size=1.5","notex"]);
 if(ctr==0,Expr(pLB+[-0.1,4.4],"w","a=",["Size=1.4","notex"]));
 if(ctr==1,Expr(pLB+[-0.1,4.4],"w","b=",["Size=1.4","notex"]));
 
-Expr([7,-1],"e","a="+aa,["Size=1.5","notex"]);
-Expr([7,-2],"e","b="+bb,["Size=1.5","notex"]);
+Expr([6,1],"e","a="+aa,["Size=1.5","notex"]);
+Expr([8,1],"e","b="+bb,["Size=1.5","notex"]);
+Expr([6,0],"e","y="+aa+"x+"+bb,["Size=1.5","notex"]);
 
-if(length(aa)*length(bb)>0,
- tmp1=parse(aa);
- tmp2=parse(bb);
- Lineplot("1",[[0,tmp2],[1,tmp1+tmp2]],["Color=red"]);
+if(gflag==1,
+ if(length(aa)*length(bb)>0,
+  tmp1=parse(aa);
+  tmp2=parse(bb);
+  Lineplot("1",[[0,tmp2],[1,tmp1+tmp2]],["Color=red"]);
+ );
+
+ tmp=Fracform(X.x,10);
+ tmp=Totexform(tmp_1);
+ Expr([X.x,-0.6],"s","\displaystyle"+tmp,["Size=1.6"]);
+
+ yy=tmp1*X.x+tmp2;
+ Listplot("1",[[X.x,0],[X.x,yy],[0,yy]],["do"]);
+ Vtickmark([yy,"y"],["Size=1.6"]);
+
+ Letter([6,-2.5],"e","スライダーで$x$の値を定めると",["Size=1.4"]);
+
+ str="y=fr(30,20)";
+ //str=Textedit(2); // only ketjs
+ tmp=Strsplit(str,"=");
+ ans=Ansform(tmp_2);
+ if(length(ans_2)>0,
+ Vtickmark([ans_1,""]);
+ Expr([-0.1,ans_1],"w","\displaystyle"+ans_2,["Size=1.6"]);
+ );
 );
+
+
 Windispg();

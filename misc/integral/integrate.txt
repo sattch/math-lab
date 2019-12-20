@@ -1,0 +1,79 @@
+////////////// Initialization/KETlib ////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(plugindirectory);
+import("ketcindy.ini");
+
+sflag=0;
+
+////////////// Draw/Figures ////////////
+Ketinit();
+Setketcindyjs(["Nolabel=all","Color=lightgray"]);//no ketjs
+Ketcindyjsbody(["<p,f10>_;定積分の定義"],[]);
+
+Setwindow([-0.5,4.5],[-0.5,4.5]);
+Ospline("1",[A,B,C,D]);
+
+
+Slider("E",[XMIN,0],[XMAX,0]);
+Slider("F",[XMIN,0],[XMAX,0]);
+Htickmark([E.x,"a",F.x,"b"]);
+Expr([5.5,4.5],"e","a="+text(E.x),["Size=1.5"]);
+Expr([5.5,4],"e","b="+text(F.x),["Size=1.5"]);
+
+tmp=Integrate("bzo1",[E.x,F.x]);
+Expr([5.5,3.5],"e","S="+text(tmp),["Size=1.5"]);
+
+ss=Animationparam(2,1,[1,100]);
+N=round(ss);//N=10;
+xL=0..N;
+xL=apply(xL,E.x+#/N*(F.x-E.x));
+PL=[];
+S=0;
+forall(1..length(xL),
+ regional(tmp,tmp1,tmp2);
+ tmp=xL_#;
+ Listplot(text(#),[[tmp,0],[tmp,YMAX]],["nodisp","Msg=n"]);
+ tmp1=Intersectcrvs("bzo1","sg"+text(#));
+ tmp1=tmp1_1;
+ PL=append(PL,tmp1);
+);
+
+ymaxL=[];
+yminL=[];
+forall(1..length(PL)-1,
+ regional(tmp,tmp1,tmp2,tmp3);
+ tmp1=PL_#;
+ tmp2=PL_(#+1);
+ tmp=Partcrv(text(#),tmp1,tmp2,"bzo1",["nodisp","Msg=n"]);
+ yL=[];
+ forall(1..length(tmp),k,
+  tmp3=tmp_k;
+  tmp3=tmp3_2;
+  yL=append(yL,tmp3);
+ );
+ ymax=max(yL);
+ ymaxL=append(ymaxL,ymax);
+ ymin=min(yL);
+ yminL=append(yminL,ymin);
+);
+
+Smax=0;
+Smin=0;
+forall(1..length(xL)-1,
+ regional(tmp,tmp1,tmp2,tmp3,tmp4,tmp5,tmp6);
+ tmp1=xL_#;
+ tmp2=xL_(#+1);
+ tmp3=ymaxL_#;
+ tmp4=yminL_#;
+ Framedata2("bx1"+text(#),[[tmp1,0],[tmp2,tmp3]],["Color=blue","Msg=n"]);
+ tmp5=(tmp2-tmp1)*tmp3;
+ Smax=Smax+tmp5;
+ Framedata2("bx2"+text(#),[[tmp1,0],[tmp2,tmp4]],["Color=red","Msg=n"]);
+ tmp6=(tmp2-tmp1)*tmp4;
+ Smin=Smin+tmp6;
+);
+Expr([5.5,3],"e","S_{\mathrm{upper}}="+text(Smax),["Size=1.5"]);
+Expr([5.5,2.5],"e","S_{\mathrm{lower}}="+text(Smin),["Size=1.5"]);
+
+Windispg();

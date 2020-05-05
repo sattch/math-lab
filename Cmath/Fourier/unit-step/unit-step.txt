@@ -1,9 +1,9 @@
 Ketinit();
 Setketcindyjs(["Nol=all","Color=offwhite"]);
-Ketcindyjsbody(["<p,f10>_;_;単位ステップ関数の合成"],[
- "<p,f6>_;(1)_;Aの値を定める．",
- "<p,f6>_;(2)_;Bの値を定める．",
- "<p,f6>_;(3)_;Cの値を定める．"
+Ketcindyjsmain(["<pf10/fp>_;_;単位ステップ関数の合成"],[
+ "<pf5/fpbr>_;(1)_;Aの値を定める．",
+ "<pf5/fpbr>_;(2)_;Bの値を定める．",
+ "<pf5/fpbr>_;(3)_;Cの値を定める．"
 ]);
 Addax(0);
 Drwxy();

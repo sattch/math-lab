@@ -22,7 +22,7 @@ str3="0";
 //Movetojs(2,[11,2-0.15],15);
 //Movetojs(3,[11,1-0.15],15); only ketjs off
 
-Expr([10,4],"e","y="+str1+"*U(t-a)+"+str2+"*U(t-b)+"+str3+"*U(t-c)");
+Expr([10,4],"e","y="+str1+"\cdot U(t-a)+"+str2+"\cdot U(t-b)+"+str3+"\cdot U(t-c)");
 
 Htickmark([aa,"a",bb,"b",cc,"c"]);
 Vtickmark([-4,"-4",-3,"-3",-2,"-2",-1,"-1",1,"1",2,"2",3,"3",4,"4"]);

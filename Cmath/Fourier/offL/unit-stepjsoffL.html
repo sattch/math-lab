@@ -1131,83 +1131,11 @@ Removespace(str):=(
   );
   out=substring(out,0,tmp);
 );
-Slider(ptstr,p1,p2):=Slider(ptstr,p1,p2,[]);
-Slider(ptstr,p1,p2,options):=(//190120
-  regional(pA,pB,pC,color,thick,sep,tmp,tmp1,tmp2);
-  color="Color=0.6*[0,0,1]"; //190120from
-  thick="size->2";
-  sep=0.3; //190824
-  forall(options,
-    tmp=Toupper(substring(#,0,1));
-    if(tmp=="C",
-      color=#;
-    );
-    if(tmp=="T",
-      tmp=Strsplit(#,"=");
-      thick="size->"+tmp_2;
-    );
-    if(tmp=="S",//190824from
-      tmp=Strsplit(#,"=");
-      sep=parse(tmp_2);
-    ); //190824to
-  );
-  tmp=Indexall(ptstr,"-");
-  if(length(tmp)>0,
-    pA=substring(ptstr,0,tmp_1-1); //190824from
-    pC=substring(ptstr,tmp_1,tmp_2-1);
-    pB=substring(ptstr,tmp_2,length(ptstr));
-    parse(pA).xy=p1;
-    parse(pB).xy=p2; //190824to
-    tmp1=pC+"position"; //190827from
-    if(!islist(parse(tmp1)),
-      tmp2=parse(pC).xy;
-      if(|tmp2-p1|<0.1,tmp2=p1+0.1*(p2-p1)/|p2-p1|);
-      if(|tmp2-p2|<0.1,tmp2=p2+0.1*(p1-p2)/|p1-p2|);
-      tmp=tmp1+"="+textformat(tmp2,6)+";";
-      parse(tmp);
-      parse(pC).xy=tmp2;
-    ); //190827to
-    PTEXCEPTION=concat(TEXCEPTION,[pA,pC,pB]);
-  ,
-    pC=ptstr; pA=pC+"l"; pB=pC+"r"; 
-    PTEXCEPTION=concat(PTEXCEPTION,[pC]);
-  );
-  Listplot(pA+pB,[p1,p2],["Msg=n","notex",color,thick]);
-  Putonseg(pC,parse("sg"+pA+pB));
-);
-Putonseg(name,sgstr):=(
-  regional(seg,p1,p2);
-  if(isstring(sgstr),seg=parse(sgstr),seg=sgstr);
-  Putonseg(name,LLcrd(seg_1),LLcrd(seg_2));
-);
-Putonseg(name,p1,p2):=Putonseg(name,p1,p2,[]);
-Putonseg(name,p1org,p2org,options):=(
-  regional(Eps,par,p1,p2,dx,dy,p,tmp,tmp1,tmp2);
-  Eps=10^(-5);
-  par=0.5;
-  tmp=Divoptions(options);
-  if(length(tmp_6)>0,
-    par=tmp_6_1;
-  );
-  p1=Lcrd(p1org);//16.10.11from
-  p2=Lcrd(p2org);
-  p1=Pcrd(p1); p2=Pcrd(p2); //190120
-  dx=p2_1-p1_1;
-  dy=p2_2-p1_2;
-  p=parse(name+".xy");
-  if(abs(dx)>abs(dy), //190120from
-    if(p1_1>p2_1,tmp=p1;p1=p2;p2=tmp);
-    if(p_1<p1_1,parse(name+".xy="+Textformat(p1,5));p=p1);
-    if(p_1>p2_1,parse(name+".xy="+Textformat(p2,5));p=p2);
-    tmp=(p2_2-p1_2)/(p2_1-p1_1)*(p_1-p1_1)+p1_2;
-    parse(name+".y="+tmp+";"); //190415
-  ,
-    if(p1_2>p2_2,tmp=p1;p1=p2;p2=tmp);
-    if(p_2<p1_2,parse(name+".xy="+Textformat(p1,5));p=p1);
-    if(p_2>p2_2,parse(name+".xy="+Textformat(p2,5));p=p2);
-    tmp=(p2_1-p1_1)/(p2_2-p1_2)*(p_2-p1_2)+p1_1;
-    parse(name+".x="+tmp+";"); //190415
-  ); //190120to
+Textedit(no):=(
+  regional(tmp,tmp1,tmp2);
+  tmp="Text"+text(no)+".currenttext";
+  tmp1=parse(tmp);
+  tmp1;
 );
 Htickmark(arglist):=Htickmark(arglist,[]); //190203
 Htickmark(arglist,options):=( //190203
@@ -1396,40 +1324,44 @@ Ketcindyjsscale=1;
 </script>
 <script id="csdraw" type="text/x-cindyscript">
 Ketinit();
-Setketcindyjs(["Nol=all","Color=offwhite"]);
+Setketcindyjs(["Local=y","Scale=1","Nolabel=all","Color=offwhite","Equal="]);
 Ketcindyjsmain(["<pf10/fp>_;_;単位ステップ関数の合成"],[
- "<pf5/fpbr>_;(1)_;$A$の値を定める．",
- "<pf5/fpbr>_;(2)_;$B$の値を定める．",
- "<pf5/fpbr>_;(3)_;$C$の値を定める．"
+ "<pf5/fpbr>_;(1)_;$A$の値を入力する．",
+ "<pf5/fpbr>_;(2)_;$B$の値を入力する．",
+ "<pf5/fpbr>_;(3)_;$C$の値を入力する．"
 ]);
 Addax(0);
 Drwxy();
 
 aa=2; bb=5; cc=7;
-Slider("A",[11,-2],[11,2]);
-Aval=round(A.y);
-Expr(A,"e","A="+text(Aval));
-Slider("B",[13,-2],[13,2]);
-Bval=round(B.y);
-Expr(B,"e","B="+text(Bval));
-Slider("C",[15,-2],[15,2]);
-Cval=round(C.y);
-Expr(C,"e","C="+text(Cval));
-Expr([10,6],"e","y="+text(Aval)+"*U(t-a)+"+text(Bval)+"*U(t-b)+"+text(Cval)+"*U(t-c)");
+Expr([11-0.1,3],"w","A=");
+str1="1";
+Expr([11-0.1,2],"w","B=");
+str2="0";
+Expr([11-0.1,1],"w","C=");
+str3="0";
+str1=Textedit(1); 
+str2=Textedit(2);
+str3=Textedit(3);
+Movetojs(1,[11,3-0.15],15);
+Movetojs(2,[11,2-0.15],15);
+Movetojs(3,[11,1-0.15],15); 
+
+Expr([10,4],"e","y="+str1+"*U(t-a)+"+str2+"*U(t-b)+"+str3+"*U(t-c)");
 
 Htickmark([aa,"a",bb,"b",cc,"c"]);
-Vtickmark([-6,"",-5,"-5",-4,"",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"",5,"5",6,""]);
+Vtickmark([-4,"-4",-3,"-3",-2,"-2",-1,"-1",1,"1",2,"2",3,"3",4,"4"]);
 
 Listplot("1",[[XMIN,0],[aa,0]],["dr,2"]);
-Listplot("2",[[aa,Aval],[bb,Aval]],["dr,2"]);
-Listplot("3",[[bb,Aval+Bval],[cc,Aval+Bval]],["dr,2"]);
-Listplot("4",[[cc,Aval+Bval+Cval],[XMAX,Aval+Bval+Cval]],["dr,2"]);
-Pointdata("11",[aa,Aval],["Size=3","Inside=0"]);
+Listplot("2",[[aa,parse(str1)],[bb,parse(str1)]],["dr,2"]);
+Listplot("3",[[bb,parse(str1)+parse(str2)],[cc,parse(str1)+parse(str2)]],["dr,2"]);
+Listplot("4",[[cc,parse(str1)+parse(str2)+parse(str3)],[XMAX,parse(str1)+parse(str2)+parse(str3)]],["dr,2"]);
+Pointdata("11",[aa,parse(str1)],["Size=3","Inside=0"]);
 Pointdata("12",[aa,0],["Size=3"]);
-Pointdata("21",[bb,Aval+Bval],["Size=3","Inside=0"]);
-Pointdata("22",[bb,Aval],["Size=3"]);
-Pointdata("31",[cc,Aval+Bval+Cval],["Size=3","Inside=0"]);
-Pointdata("32",[cc,Aval+Bval],["Size=3"]);
+Pointdata("21",[bb,parse(str1)+parse(str2)],["Size=3","Inside=0"]);
+Pointdata("22",[bb,parse(str1)],["Size=3"]);
+Pointdata("31",[cc,parse(str1)+parse(str2)+parse(str3)],["Size=3","Inside=0"]);
+Pointdata("32",[cc,parse(str1)+parse(str2)],["Size=3"]);
 
 Windispg();
 
@@ -1449,19 +1381,17 @@ var cdy = CindyJS({
   },
   angleUnit: "°",
   geometry: [
-    {name: "SW", type: "Free", pos: [-0.5714285714285714, -4.0, 0.5714285714285714], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "NE", type: "Free", pos: [4.0, 3.111111111111111, 0.4444444444444444], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "A", type: "Free", pos: [4.0, 0.36363636363636365, 0.36363636363636365], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "B", type: "Free", pos: [4.0, -0.0, 0.3076923076923077], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
-    {name: "C", type: "Free", pos: [4.0, -0.0, 0.26666666666666666], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true }
+    {name: "SW", type: "Free", pos: [-1.0, -4.0, 1.0], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
+    {name: "NE", type: "Free", pos: [4.0, 1.7777777777777777, 0.4444444444444444], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
+    {name: "Text1", type: "EditableText", pos: [4.0, 1.0909090909090908, 0.36363636363636365], color: [0.0, 0.0, 0.0], text: "", textsize: 15.0},
+    {name: "Text2", type: "EditableText", pos: [4.0, 0.7272727272727273, 0.36363636363636365], color: [0.0, 0.0, 0.0], text: ""},
+    {name: "Text3", type: "EditableText", pos: [4.0, 0.36363636363636365, 0.36363636363636365], color: [0.0, 0.0, 0.0], text: ""}
   ],
   ports: [{
     id: "CSCanvas",
-    width: 762,
-    height: 527,
-    transform: [{visibleRect: [-2.1241499641397956, 8.211016063688144, 20.137856678491357, -7.185411102541013]}],
-    grid: 1.0,
-    snap: true,
+    width: 1030,
+    height: 526,
+    transform: [{visibleRect: [-2.020931415547219, 4.947467591589303, 16.315743592119187, -4.4166984802869385]}],
     background: "rgb(247,247,247)"
   }],
   csconsole: false,

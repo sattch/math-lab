@@ -1,37 +1,41 @@
 Ketinit();
-Setketcindyjs(["Nol=all","Color=offwhite"]);
+Setketcindyjs(["Local=y","Scale=1","Nolabel=all","Color=offwhite","Equal="]);
 Ketcindyjsmain(["<pf10/fp>_;_;単位ステップ関数の合成"],[
- "<pf5/fpbr>_;(1)_;Aの値を定める．",
- "<pf5/fpbr>_;(2)_;Bの値を定める．",
- "<pf5/fpbr>_;(3)_;Cの値を定める．"
+ "<pf5/fpbr>_;(1)_;$A$の値を入力する．",
+ "<pf5/fpbr>_;(2)_;$B$の値を入力する．",
+ "<pf5/fpbr>_;(3)_;$C$の値を入力する．"
 ]);
 Addax(0);
 Drwxy();
 
 aa=2; bb=5; cc=7;
-Slider("A",[11,-2],[11,2]);
-Aval=round(A.y);
-Expr(A,"e","A="+text(Aval));
-Slider("B",[13,-2],[13,2]);
-Bval=round(B.y);
-Expr(B,"e","B="+text(Bval));
-Slider("C",[15,-2],[15,2]);
-Cval=round(C.y);
-Expr(C,"e","C="+text(Cval));
-Expr([10,6],"e","y="+text(Aval)+"*U(t-a)+"+text(Bval)+"*U(t-b)+"+text(Cval)+"*U(t-c)");
+Expr([11-0.1,3],"w","A=");
+str1="1";
+Expr([11-0.1,2],"w","B=");
+str2="0";
+Expr([11-0.1,1],"w","C=");
+str3="0";
+//str1=Textedit(1); only ketjs on
+//str2=Textedit(2); 
+//str3=Textedit(3); 
+//Movetojs(1,[11,3-0.15],15);
+//Movetojs(2,[11,2-0.15],15);
+//Movetojs(3,[11,1-0.15],15); only ketjs off
+
+Expr([10,4],"e","y="+str1+"*U(t-a)+"+str2+"*U(t-b)+"+str3+"*U(t-c)");
 
 Htickmark([aa,"a",bb,"b",cc,"c"]);
-Vtickmark([-6,"",-5,"-5",-4,"",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"",5,"5",6,""]);
+Vtickmark([-4,"-4",-3,"-3",-2,"-2",-1,"-1",1,"1",2,"2",3,"3",4,"4"]);
 
 Listplot("1",[[XMIN,0],[aa,0]],["dr,2"]);
-Listplot("2",[[aa,Aval],[bb,Aval]],["dr,2"]);
-Listplot("3",[[bb,Aval+Bval],[cc,Aval+Bval]],["dr,2"]);
-Listplot("4",[[cc,Aval+Bval+Cval],[XMAX,Aval+Bval+Cval]],["dr,2"]);
-Pointdata("11",[aa,Aval],["Size=3","Inside=0"]);
+Listplot("2",[[aa,parse(str1)],[bb,parse(str1)]],["dr,2"]);
+Listplot("3",[[bb,parse(str1)+parse(str2)],[cc,parse(str1)+parse(str2)]],["dr,2"]);
+Listplot("4",[[cc,parse(str1)+parse(str2)+parse(str3)],[XMAX,parse(str1)+parse(str2)+parse(str3)]],["dr,2"]);
+Pointdata("11",[aa,parse(str1)],["Size=3","Inside=0"]);
 Pointdata("12",[aa,0],["Size=3"]);
-Pointdata("21",[bb,Aval+Bval],["Size=3","Inside=0"]);
-Pointdata("22",[bb,Aval],["Size=3"]);
-Pointdata("31",[cc,Aval+Bval+Cval],["Size=3","Inside=0"]);
-Pointdata("32",[cc,Aval+Bval],["Size=3"]);
+Pointdata("21",[bb,parse(str1)+parse(str2)],["Size=3","Inside=0"]);
+Pointdata("22",[bb,parse(str1)],["Size=3"]);
+Pointdata("31",[cc,parse(str1)+parse(str2)+parse(str3)],["Size=3","Inside=0"]);
+Pointdata("32",[cc,parse(str1)+parse(str2)],["Size=3"]);
 
 Windispg();

@@ -1,0 +1,36 @@
+Ketinit();
+Setketcindyjs(["Local=y","Nolabel=all","Color=offwhite","Equal="]);
+Ketcindyjsmain(["<pf10/fp>_;_;微分係数の定義(1)"],["<pf5/fp>$h$の値を代入して，平均変化率が微分係数に近づく様子を確認する．"]);
+Setwindow([-5,5],[-5,20]);
+
+Plotdata("1","x^2","x",["dr,1.5"]);
+Expr([sqrt(20),20],"nw","y=x^2",["Size=1.5"]);
+Lineplot("1",[[0,-4],[2,4]],["dr,0.75"]);
+Letter([5,16],"se","接線",["Size=1.5"]);
+Pointdata("1",[2,4],["Size=3"]);
+Listplot("do1",[[2,0],[2,4],[0,4]],["do"]);
+Htickmark([2,"2"]);
+Vtickmark([-4,"-4",4,"4"]);
+
+Expr([8-0.1,8],"w","h=",["Size=1.5"]);
+str="2";
+//str=Textedit(51); only ketjs
+Movetojs(51,[8,8-0.2],15);
+Expr([8,6],"e","(0\leq h\leq 2.4)",["Size=1.5"]);
+
+if(parse(str)==0,
+ Pointdata("2",[2,4],["Size=3","Color=blue"]);
+ Lineplot("2",[[0,-4],[2,4]],["Color=blue"]);
+,
+ Pointdata("2",[2+parse(str),(2+parse(str))^2],["Size=3","Color=blue"]);
+ Lineplot("2",[[2,4],pt2_1],["Color=blue"]);
+ Listplot("do2",[[2+parse(str),0],pt2_1],["do","Color=blue"]);
+ Htickmark([2+parse(str),""]);
+ if(parse(str)<1.3,
+  Expr([2+parse(str)-0.4,0],"se","2+h");
+ ,
+  Expr([2+parse(str),0],"s1","2+h");
+ );
+);
+
+Windispg();

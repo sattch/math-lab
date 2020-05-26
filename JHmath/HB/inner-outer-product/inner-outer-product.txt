@@ -48,16 +48,16 @@ Arrowdata("2",[O,B],[2,18,1,0.2]);
 Anglemark("1",[A,O,B],[1,"Expr=1.2,\theta"]);
 
 Letter([5,-1.5],"e","$\vec{\ a}$と$\vec{\ b}$の外積",["Size=1.5"]);
-Expr([7-0.1,-2],"w","\vec{\ a}\times\vec{\ b}=",["Size=1.5","Color=red"]);
+Expr([10-0.1,-2],"w","\vec{\ a}\times\vec{\ b}=|\vec{\ a}|\,|\vec{\ b}|\,\sin\theta=",["Size=1.5","Color=red"]);
 if(exflag==1,
  Listplot("da1",[A,A+B,B],["da","Color=red"]);
  Listplot("1",[O,A,A+B,B,O],["nodisp"]);
  Shade(["sg1"],["Color=red"]);
- Expr([7,-2],"e",text(parse(str1)*parse(str2)*sin(parse(str3)*pi)),["Size=1.5","Color=blue"]);
+ Expr([10,-2],"e",text(parse(str1)*parse(str2)*sin(parse(str3)*pi)),["Size=1.5","Color=blue"]);
 );
 
 Letter([5,-3],"e","$\vec{\ a}$と$\vec{\ b}$の内積",["Size=1.5"]);
-Expr([7-0.1,-3.5],"w","\vec{\ a}\cdot\vec{\ b}=",["Size=1.5","Color=blue"]);
+Expr([10-0.1,-3.5],"w","\vec{\ a}\cdot\vec{\ b}=|\vec{\ a}|\,|\vec{\ b}|\,\cos\theta=",["Size=1.5","Color=blue"]);
 if(inflag==1,
  if(parse(str3)!=1/2,
   Putpoint("H",parse(str2)*[cos(parse(str3)*pi),0]);
@@ -65,7 +65,7 @@ if(inflag==1,
   Arrowdata("3",[O,H],[2,18,1,0.2,"Color=blue"]);
   Listplot("da2",[B,H],["da","Color=blue"]);
  );
- Expr([7,-3.5],"e",text(parse(str1)*parse(str2)*cos(parse(str3)*pi)),["Size=1.5","Color=blue"]);
+ Expr([10,-3.5],"e",text(parse(str1)*parse(str2)*cos(parse(str3)*pi)),["Size=1.5","Color=blue"]);
 );
 
 Windispg();

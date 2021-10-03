@@ -8,12 +8,6 @@ str1="5"; //no ketjs
 str2="5"; //no ketjs
 //str2=Textedit(32); //only ketjs
 
-str3=""; //no ketjs
-//str3=Textedit(33); //only ketjs
-
-str4=""; //no ketjs
-//str4=Textedit(34); //only ketjs
-
 ////////// xy座標の設定 //////////
 XMIN=-1*parse(str1);
 XMAX=parse(str1);

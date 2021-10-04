@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     
-    <title>Graph0.cdy</title>
+    <title>Graph1.cdy</title>
     <style type="text/css">
         * {
             margin: 0px;
@@ -825,296 +825,6 @@ Vtickmark(arglist,options):=( //190203
     );
   );//180710to//  tmp=MakeRarg(arglist);
 );
-Intersectcrvs(Gr1,Gr2):=Intersectcrvs(Gr1,Gr2,[]);
-Intersectcrvs(Gr1,Gr2,options):=(
-  regional(tmp,tmp1,tmp2);
-  tmp1=Intersectcrvspp(Gr1,Gr2,options);
-  apply(tmp1,#_1);
-);
-Intersectcrvspp(Gr1,Gr2):=Intersectcrvspp(Gr1,Gr2,[]);
-Intersectcrvspp(Gr1,Gr2,options):=(
-  regional(Out,Eps,Eps2,Eps0,Flg,Data1,Data2,
-    Tmp1,Tmp2,Tmp3,Tmp,KL1,KL2,pA,pB,Ni,Nj,
-    pP,pQ,rT,Flg,eqL,realL,opstr,Dif);
-  Eps=10^(-6); //210730
-  Eps2=0.1;
-  Dif=0.05; // 2015.05.31
-  Flg=0;
-  Tmp1=Divoptions(options); // 
-  eqL=Tmp1_5;
-  realL=Tmp1_6;
-  opstr=Tmp1_(length(Tmp1));
-  forall(eqL,
-    if(substring(#,0,1)=="D",
-      Tmp1=indexof(#,"=");
-      Dif=parse(substring(#,Tmp1,length(#)));
-    );
-  );
-  Tmp1=length(realL);
-  if(Tmp1>0,
-    Eps=realL_1;
-    if(Tmp1>1,
-      Eps2=realL_2;
-    );
-  );
-  Flg=0;
-  if(isstring(Gr1),Data1=parse(Gr1),Data1=Gr1);
-  if(isstring(Gr2),Data2=parse(Gr2),Data2=Gr2);
-  if(Measuredepth(Data1)==2,Data1=Data1_1);
-  if(Measuredepth(Data2)==2,Data2=Data2_1);
-  Data1=apply(Data1,LLcrd(#));
-  Data2=apply(Data2,LLcrd(#));
-  if(length(Data1)==length(Data2),
-    Tmp1=reverse(Data2); 
-    Eps0=10^(-6);
-    Tmp2=0;
-    forall(1..(length(Data1)),
-      Tmp2=Tmp2+abs(Data1_#-Data2_#);
-    );
-    Tmp3=0;
-    forall(1..(length(Data1)),
-      Tmp3=Tmp3+abs(Data1_#-Tmp1_#);
-    );
-    if(Tmp2<Eps0 % Tmp3<Eps0,
-      Out=[];
-      Flg=1;
-    );
-  );
-  if(Flg==0,
-    KL1=[];
-    KL2=[];
-    forall(1..(length(Data1)-1),Ni,
-      pA=Data1_Ni;
-      pB=Data1_(Ni+1);
-      forall(1..(length(Data2)-1),
-        pP=Data2_#; pQ=Data2_(#+1);
-        Tmp=Koutenseg(pA,pB,pP,pQ,[Eps,Eps2]);
-        if(Tmp!=["inf","inf"],
-          if(Tmp_3==0,
-            Tmp1=[Tmp_1,Tmp_2,Ni,#];
-            KL1=concat(KL1,[Tmp1]);
-          ,
-            Tmp2=[Tmp_1,Tmp_2,Ni,#];
-            KL2=concat(KL2,[Tmp2]);
-          );
-        );
-      );
-    );
-    Out=[];
-    if(length(KL1)>0,
-      Tmp=KL1_1;
-      pP=Tmp_1;
-      rT=Tmp_2;
-      Ni=Tmp_3;
-      Nj=Tmp_4;
-      Tmp=[pP,Ni+rT,Nj];
-      Out=[Tmp];
-    );
-    forall(2..(length(KL1)),Ni, 
-      Tmp=KL1_Ni; 
-      pP=Tmp_1;
-      Tmp2=0;
-      Flg=0;
-      forall(1..(length(Out)),Nj,
-        if(Flg==0,
-          Tmp=Out_Nj;
-          if(|pP-Tmp_1|<Eps,
-            Tmp2=1;
-            Flg=1;
-          );
-        );
-      );
-      if(Tmp2==0,
-        Tmp=KL1_Ni; 
-        pP=Tmp_1;
-        rT=Tmp_2;
-        Tmp1=Tmp_3;
-        Tmp2=Tmp_4;
-        Tmp=[pP,Tmp1+rT,Tmp2];
-        Out=concat(Out,[Tmp]);
-      );
-    );
-    forall(1..(length(KL2)),Ni,
-      Tmp=KL2_Ni;  // 15.11.21 Usui
-      pP=Tmp_1; 
-      Tmp2=0;
-      Flg=0;
-      forall(1..(length(Out)),Nj,
-        if(Flg==0,
-          Tmp=Out_Nj;
-          if(|pP-Tmp_1|<Eps,
-            Tmp2=1;
-            Flg=1;
-          );
-        );
-      );
-      if(Tmp2==0,
-        Tmp=KL2_Ni;
-        rT=Tmp_2;
-        rT=min([max([rT,0]),1]);  // 15.11.21 Usui
-        Tmp=[pP,Tmp_3+rT,Tmp_4];
-        Out=concat(Out,[Tmp]);
-      );
-    );
-  );
-  Tmp1=Out;  // 15.04.06 from
-  Out=[];
-  forall(Tmp1,Tmp2,
-    Tmp3=select(1..(length(Out)),//16.11.27,
-        |Out_#_1-Tmp2_1|<Dif & |Out_#_2-Tmp2_2|<=1& |Out_#_3-Tmp2_3|<=1);
-    if(length(Tmp3)==0,
-      Out=append(Out,Tmp2);
-    ,
-      forall(Tmp3, //16.11.27
-        Out_#_1=(Out_#_1+Tmp2_1)/2;//17.04.14
-      );
-    );
-  ); // 15.04.06 until
-  Out;
-);
-Measuredepth(list):=( //190423
-  regional(str,nn,tmp,tmp1,tmp2);
-  str=text(list);
-  tmp1=Indexall(str,"[");
-  tmp2=select(tmp1,!contains(tmp1,#+1));
-  nn=tmp2_1;
-  tmp1=substring(str,nn,length(str));
-  tmp=indexof(tmp1,",");
-  tmp1=substring(tmp1,0,tmp-1);
-  if(!ispoint(parse(tmp1)),
-    nn=nn-1;
-  );
-  nn;
-);
-Indexall(str,key):=(
-  regional(rest,out,flg,tmp,tmp1,);
-  out=[];
-  rest=str;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      tmp=indexof(rest,key);
-      if(tmp>0,
-        tmp1=tmp+length(str)-length(rest);
-        out=append(out,tmp1);
-        rest=substring(rest,tmp,length(rest));
-      ,
-        flg=1;
-      );
-    );
-  );
-  out;
-);
-Koutenseg(pA,pB,pC,pD):=Koutenseg(pA,pB,pC,pD,[]);
-Koutenseg(pA,pB,pC,pD,options):=(
-  regional(Eps0,Eps,Eps2,pV,Sv2,Out,pP,pQ,Flg,p1,p2,q1,q2,
-          em1,eM1,em2,eM2,rT,Tmp1,Tmp2);
-  Eps0=10^(-4);
-  pV=pB-pA;
-  Sv2=|pV|;
-  pP=pC-pA; pQ=pD-pA;
-  Eps=10^(-3);
-  Eps2=0.2;
-  Tmp1=0;
-  forall(options,
-    if(Tmp1==0,
-      Eps=#;
-      Tmp1=1;
-    ,
-      Eps2=#;
-    );
-  );
-  Flg=0;
-  if(Sv2<10^(-3),
-     Out=["inf","inf"];
-     Flg=1;
-  );
-  if(Flg==0,
-    Eps=min([Eps2,Eps/Sv2]);
-    p1=pP*pV/Sv2^2;
-    p2=[pP_2,-pP_1]*pV/Sv2^2;
-    q1=pQ*pV/Sv2^2;
-    q2=[pQ_2,-pQ_1]*pV/Sv2^2;
-    em1=-Eps; eM1=1+Eps;
-    em2=-Eps; eM2=Eps;
-    if(max([p1,q1])<em1 % min([p1,q1])>eM1,
-      Out=["inf","inf"];
-      Flg=1;
-    );
-    if(max([p2,q2])<em2 % min([p2,q2])>eM2,
-      Out=["inf","inf"];
-      Flg=1;
-    );
-  );
-  if(Flg==0 & p2*q2<0,
-    rT=p1-(q1-p1)/(q2-p2)*p2;
-    if(rT>em1 & rT<eM1,
-      if(rT>-Eps0 & rT<1+Eps0,
-        Tmp1=pA+rT*pV;
-        Tmp2=min([max([rT,0]),1]);
-        Out=[Tmp1,Tmp2,0];
-      ,
-        Tmp1=pA+rT*pV;
-        Tmp2=min([max([rT,0]),1]);
-        Out=[Tmp1,Tmp2,1];
-      );
-      Flg=1;
-    );
-    if(Flg==0 & (p1<em1 % p1>eM1 % p2<em2 % p2>eM2),
-      if(q1<em1 % q1>eM1 % q2<em2 % q2>eM2,
-         Out=["inf","inf"];
-         Flg=1;
-      );
-      if(Flg==0,
-        rT=min([max([p1,0]),1]);
-        Tmp1=pA+rT*pV;
-        Out=[Tmp1,rT,1];
-        Flg=1;
-      );
-    );
-  );
-  if(Flg==0 & (p1 > -Eps0 & p1 < 1 + Eps0 & p2 > -Eps0 & p2 < Eps0),
-    rT= p1;
-    Tmp1=pA+rT*pV;
-    Out= [Tmp1, rT, 0];
-    Flg=1;
-  );
-  if(Flg==0 & (q1 > -Eps0 & q1 < 1 + Eps0 & q2 > -Eps0 & q2 < Eps0),
-    rT= q1;
-    Tmp1=pA+rT*pV;
-    Out=[Tmp1,rT,0];
-    Flg=1;
-  );
-  if(Flg==0 & (p1<em1 %  p1>eM1 % p2<em2 % p2>eM2),
-    if(q1<em1 % q1>eM1 % q2<em2 % q2>eM2,
-      Out=["inf","inf"];      
-      Flg=1;
-    );
-    if(Flg==0,
-      rT=min([max([q1,0]),1]);
-      Tmp1=pA+rT*pV;
-      Out=[Tmp1,rT,1];
-      Flg=1;
-    );
-  );
-  if(Flg==0 & (q1<em1 %  q1>eM1% q2<em2 % q2>eM2),
-    rT=min([max([p1,0]),1]);
-    Tmp1=pA+rT*pV;
-    Out=[Tmp1,rT,1];
-    Flg=1;
-  );
-  if(Flg==0,
-    if(abs(p2)<abs(q2),
-      rT=min([max([p1,0]),1]);
-    ,
-      rT=min([max([q1,0]),1]);
-    );
-    Tmp1=pA+rT*pV;
-    Out=[Tmp1,rT,1];
-  );
-  if(!isstring(Out_1),Out=apply(Out,re(#))); //190802
-  Out;
-);
 Plotdata(name1,func,variable):=Plotdata(name1,func,variable,[]);
 Plotdata(name1,func,variable,options):=(
   regional(Fn,Va,tmp,tmp1,tmp2,eqL,name,Vname,x1,x2,dx,
@@ -1326,6 +1036,39 @@ Norm(v1):=(  // 16.09.01
 );
 Norm(v1,v2):=(
   Norm(v2-v1);
+);
+Measuredepth(list):=( //190423
+  regional(str,nn,tmp,tmp1,tmp2);
+  str=text(list);
+  tmp1=Indexall(str,"[");
+  tmp2=select(tmp1,!contains(tmp1,#+1));
+  nn=tmp2_1;
+  tmp1=substring(str,nn,length(str));
+  tmp=indexof(tmp1,",");
+  tmp1=substring(tmp1,0,tmp-1);
+  if(!ispoint(parse(tmp1)),
+    nn=nn-1;
+  );
+  nn;
+);
+Indexall(str,key):=(
+  regional(rest,out,flg,tmp,tmp1,);
+  out=[];
+  rest=str;
+  flg=0;
+  forall(1..(length(str)),
+    if(flg==0,
+      tmp=indexof(rest,key);
+      if(tmp>0,
+        tmp1=tmp+length(str)-length(rest);
+        out=append(out,tmp1);
+        rest=substring(rest,tmp,length(rest));
+      ,
+        flg=1;
+      );
+    );
+  );
+  out;
 );
 Windispg():=(
   if(ADDAXES=="1", //181215from
@@ -1642,53 +1385,37 @@ Ketcindyjsmain(["<pf10/fp>_;_;グラフの描画"],[
  "<pf5/fpbr>_;関数の式を入力しすると，グラフが描画される．"
 ]);
 
-Seteditable(30,["","Size=18","Width=150"]);
-Seteditable(31,["5","Size=18","Width=30"]);
-Seteditable(32,["5","Size=18","Width=30"]);
+Seteditable(30,["","Size=18","Width=300"]);
+Seteditable(31,["5","Size=18","Width=50"]);
 
 str0=Textedit(30); //
 
 str1=Textedit(31); //
 
-str2=Textedit(32); //
+Setwindow([-5,5],[-5,5]);
 
-str3=Textedit(33); //
+Htickmark([XMIN,"-"+text(str1),XMAX,text(str1)]);
+Vtickmark([YMIN,"-"+text(str1),YMAX,text(str1)]);
 
-str4=Textedit(34); //
-
-XMIN=-1*parse(str1);
-XMAX=parse(str1);
-YMIN=-1*parse(str2);
-YMAX=parse(str2);
-Setwindow([XMIN,XMAX],[YMIN,YMAX]);
-
-Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
-Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
-
-Letter([6,5.7],"e","$x$の最大値$=$",["Size=1.2"]);
+Letter([6,5.7],"e","$x$および$y$の最大値$=$",["Size=1.2"]);
 if(length(str1)>0,
-  Letter([9.5,5.7],"e","定義域：$"+text(XMIN)+"\,\leq x\leq\,"+text(XMAX)+"$",["Size=1.2"]);
+  Letter([6,4.7],"e","定義域：$-"+text(str1)+"\,\leq x\leq\,"+text(str1)+"$",["Size=1.2"]);
+);
+if(length(str1)>0,
+  Letter([6,3.7],"e","値　域：$-"+text(str1)+"\,\leq y\leq\,"+text(str1)+"$",["Size=1.2"]);
 );
 
-Letter([6,4.7],"e","$y$の最大値$=$",["Size=1.2"]);
-if(length(str2)>0,
-  Letter([9.5,4.7],"e","値　域：$"+text(YMIN)+"\,\leq y\leq\,"+text(YMAX)+"$",["Size=1.2"]);
-);
-
-Letter([6,3.7],"e","関数$y=$",["Size=1.2"]);
+Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
 
 if(length(str0)>0,
   regional(tmp);
-  Plotdata("1",str0,"x",["nodisp"]);
-  Listplot("0",[[XMIN,YMIN],[XMAX,YMIN],[XMAX,YMAX],[XMIN,YMAX],[XMIN,YMIN]],["nodisp"]);
-  tmp=Intersectcrvs("gr1","sg0");
-  xL=[];
-  forall(1..length(tmp),
-    xL=append(xL,(tmp_#)_1);
+  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=500"]);
+  pDL=[];
+  forall(1..length(gr1),
+    pD=gr1_#;
+	pDL=append(pDL,[pD_1/parse(str1)*5,pD_2/parse(str1)*5]);
   );
-  xL=sort(xL);
-  x1=xL_1; x2=xL_(length(xL)); 
-  Plotdata("1",str0,"x=["+text(x1)+","+text(x2)+"]",["Num=500"]);
+  Listplot("1",pDL);
 );
 
 Windispg();
@@ -1710,15 +1437,14 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 4.0, -0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [4.0, 4.0, 0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "Text30", type: "EditableText", pos: [4.0, 1.9853293025409422, 0.5468117325534149], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 150, textsize: 18.0},
-    {name: "Text31", type: "EditableText", pos: [4.0, 2.761322177901729, 0.494462360922522], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 30, text: "5", textsize: 18.0},
-    {name: "Text32", type: "EditableText", pos: [4.0, 2.2913472138134563, 0.494462360922522], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 30, text: "5", textsize: 18.0}
+    {name: "Text30", type: "EditableText", pos: [4.0, 1.4334140435835352, 0.5502527406105239], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 300, textsize: 18.0},
+    {name: "Text31", type: "EditableText", pos: [4.0, 2.4397705544933075, 0.43452080663890313], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 50, text: "5", textsize: 18.0}
   ],
   ports: [{
     id: "CSCanvas",
     width: 1180,
-    height: 705,
-    transform: [{visibleRect: [-5.817269568618303, 6.450920716788527, 14.952406954739027, -5.958080934878353]}],
+    height: 671,
+    transform: [{visibleRect: [-5.817269568618303, 6.450920716788527, 14.952406954739027, -5.3596326282731415]}],
     grid: 1.0,
     snap: true,
     background: "rgb(247,247,247)"

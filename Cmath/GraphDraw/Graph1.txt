@@ -1,0 +1,35 @@
+////////// 入力窓の設定 //////////
+str0="x^2"; //no ketjs
+//str0=Textedit(30); //only ketjs
+
+str1="5"; //no ketjs
+//str1=Textedit(31); //only ketjs
+
+////////// xy座標の設定 //////////
+Setwindow([-5,5],[-5,5]);
+
+Htickmark([XMIN,"-"+text(str1),XMAX,text(str1)]);
+Vtickmark([YMIN,"-"+text(str1),YMAX,text(str1)]);
+
+////////// 問題文の設定 //////////
+Letter([6,5.7],"e","$x$および$y$の最大値$=$",["Size=1.2"]);
+if(length(str1)>0,
+  Letter([6,4.7],"e","定義域：$-"+text(str1)+"\,\leq x\leq\,"+text(str1)+"$",["Size=1.2"]);
+);
+if(length(str1)>0,
+  Letter([6,3.7],"e","値　域：$-"+text(str1)+"\,\leq y\leq\,"+text(str1)+"$",["Size=1.2"]);
+);
+
+Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
+
+////////// グラフの設定 //////////
+if(length(str0)>0,
+  regional(tmp);
+  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=500"]);
+  pDL=[];
+  forall(1..length(gr1),
+    pD=gr1_#;
+	pDL=append(pDL,[pD_1/parse(str1)*5,pD_2/parse(str1)*5]);
+  );
+  Listplot("1",pDL);
+);

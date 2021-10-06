@@ -25,10 +25,23 @@ Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
 ////////// グラフの設定 //////////
 if(length(str0)>0,
   regional(tmp);
-  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=500"]);
+  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=1000"]);
+  stgr1=text(gr1);
+  gL=[];
+  if(indexof(stgr1,"[[[")==0,
+    gL=gr1;
+  ,
+    forall(1..length(gr1),
+      sgL=gr1_#;
+	  if(length(sgL)>1,
+	    gL=append(gL,sgL);
+      );
+    );
+    gL=gL_1;
+  );
   pDL=[];
-  forall(1..length(gr1),
-    pD=gr1_#;
+  forall(1..length(gL),
+    pD=gL_#;
 	pDL=append(pDL,[pD_1/parse(str1)*5,pD_2/parse(str1)*5]);
   );
   Listplot("1",pDL);

@@ -1409,10 +1409,23 @@ Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
 
 if(length(str0)>0,
   regional(tmp);
-  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=500"]);
+  Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=1000"]);
+  stgr1=text(gr1);
+  gL=[];
+  if(indexof(stgr1,"[[[")==0,
+    gL=gr1;
+  ,
+    forall(1..length(gr1),
+      sgL=gr1_#;
+	  if(length(sgL)>1,
+	    gL=append(gL,sgL);
+      );
+    );
+    gL=gL_1;
+  );
   pDL=[];
-  forall(1..length(gr1),
-    pD=gr1_#;
+  forall(1..length(gL),
+    pD=gL_#;
 	pDL=append(pDL,[pD_1/parse(str1)*5,pD_2/parse(str1)*5]);
   );
   Listplot("1",pDL);
@@ -1443,14 +1456,15 @@ var cdy = CindyJS({
   ports: [{
     id: "CSCanvas",
     width: 1180,
-    height: 671,
-    transform: [{visibleRect: [-5.817269568618303, 6.450920716788527, 14.952406954739027, -5.3596326282731415]}],
+    height: 717,
+    transform: [{visibleRect: [-5.817269568618303, 6.450920716788527, 14.952406954739027, -6.169297984268428]}],
     grid: 1.0,
     snap: true,
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
-  cinderella: {build: 2028, version: [3, 0, 2028]}
+  use: ["katex"],
+  cinderella: {build: 1999, version: [3, 0, 1999]}
 });
     </script>
 </head>

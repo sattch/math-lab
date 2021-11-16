@@ -1,0 +1,103 @@
+////////// xy座標の設定 //////////
+Listplot("do0",[[1,0],[1,1],[0,1]],["do"]);
+Htickmark([1,"1"]);
+Vtickmark([1,"1"]);
+
+////////// 入力窓の設定 //////////
+str0="m=2"; //no ketjs
+//str0=Textedit(30); //only ketjs
+str0L=Strsplit(str0,"=");
+str0=str0L_2;
+
+str1="n=3"; //no ketjs
+//str1=Textedit(31); //only ketjs
+str1L=Strsplit(str1,"=");
+str1=str1L_2;
+
+str2="0.125"; //no ketjs
+//str2=Textedit(32); //only ketjs
+
+////////// 問題文の設定 //////////
+Letter([1.6,1.15],"e","とおくと，$0$から$1$までの関数$y=x^m$の定積分",["Size=1.2"]);
+if(length(str0)==0,
+  Expr([1.5,1.05],"e","\displaystyle S=\int_0^1 x^m\,dx",["Sizw=1.2"]);
+  Letter([1.35,0.95],"e","の近似値を定義式に従って計算しよう．",["Size=1.2"]);
+,
+  Expr([1.5,1.05],"e","\displaystyle S=\int_0^1 x^m\,dx=\int_0^1 x^"+str0+"\,dx",["Sizw=1.2"]);
+  Letter([1.35,0.95],"e","の近似値$S_{\Delta}$を定義式に従って計算しよう．",["Size=1.2"]);
+);
+
+////////// グラフ（問題）の設定 //////////
+if(length(str0)>0,
+  Plotdata("1","x^"+str0,"x",["dr,1.5"]);
+  Listplot("0",[[0,0],[1,0],[1,1]],["dr,1.5"]);
+);
+
+////////// 解答の設定 //////////
+if(length(str0)>0,
+  Letter([1.6,0.85],"e","とおくと",["Size=1.2"]);
+  
+  ////////// 解答文の設定 //////////
+  if((length(str0)==0)%(length(str1)==0),
+    Expr([1.5,0.75],"e","\Delta x=\dfrac{1}{n}",["Size=1.2"]);
+    Expr([1.8,0.75],"e",",\ x_k=\dfrac{k}{n}",["Size=1.2"]);
+	Expr([1.5,0.6],"e","\displaystyle S_{\Delta}=\sum_{k=1}^n {x_k}^m\,\Delta x",["Size=1.2"]);
+  ,
+    Expr([1.5,0.75],"e","\Delta x=\dfrac{1}{n}=\dfrac{1}{"+str1+"}",["Size=1.2"]);
+    Expr([1.8,0.75],"e",",\ x_k=\dfrac{k}{n}=\dfrac{k}{"+str1+"}",["Size=1.2"]);
+	Expr([1.5,0.6],"e","\displaystyle S_{\Delta}=\sum_{k=1}^{"+str1+"} {x_k}^"+str0+"\,\Delta x=\sum_{k=1}^{"+str1+"}(\frac{k}{"+str1+"})^{"+str0+"}\cdot\frac{1}{"+str1+"}=\frac{1}{"+str1+"^{"+str0+"}}\sum_{k=1}^{"+str1+"} k^"+str0,["Size=1.2"]);
+	if(str1=="1",
+      Expr([1.5,0.45],"e","\displaystyle \phantom{S_{\Delta}}="+str2+"^"+str0,["Size=1.2"]);
+    );
+	if(str1=="2",
+      Expr([1.5,0.45],"e","\displaystyle \phantom{S_{\Delta}}=\frac{1}{"+str1+"}("+text(1/parse(str1)*1)+"^"+str0+"+1^"+str0+")",["Size=1.2"]);
+    );
+	if(str1=="3",
+      Expr([1.5,0.45],"e","\displaystyle \phantom{S_{\Delta}}=\frac{1}{"+str1+"}("+text(1/parse(str1)*1)+"^"+str0+"+"+text(1/parse(str1)*2)+"^"+str0+"+1^"+str0+")",["Size=1.2"]);
+    );
+	if(parse(str1)>3,
+      Expr([1.5,0.45],"e","\displaystyle \phantom{S_{\Delta}}=\frac{1}{"+str1+"}("+text(1/parse(str1)*1)+"^"+str0+"+"+text(1/parse(str1)*2)+"^"+str0+"+\cdots+1^"+str0+")",["Size=1.2"]);
+    );
+    Expr([1.5,0.3],"e","\displaystyle \phantom{S_{\Delta}}=",["Size=1.2"]);
+  );
+  
+  ////////// グラフ（問題）の設定 //////////
+  if((length(str0)>0)&(length(str1)>0),
+    mm=parse(str0);
+    nn=parse(str1);
+	forall(1..nn,
+	  x1=(#-1)/nn;
+	  x2=#/nn;
+      Listplot(text(#),[[x1,0],[x2,0],[x2,x2^mm],[x1,x2^mm],[x1,0]],["nodisp"]);
+	  Shade(["sg"+text(#)],["Color=[0.5,0,0,0]"]);
+      Listplot(text(#),[[x1,0],[x2,0],[x2,x2^mm],[x1,x2^mm],[x1,0]]);
+	);
+    Plotdata("1","x^"+str0,"x",["dr,1.5"]);
+  );
+
+  ////////// 答えの設定 //////////
+  if((length(str0)>0)&(length(str1)>0),
+    mm=parse(str0);
+    nn=parse(str1);
+	ans=0;
+	forall(1..nn,
+	  ans=ans+((#/nn)^mm)/nn;
+	);
+	println("ans="+text(ans));
+  );
+
+  ////////// 答え合わせの設定 //////////
+  if(length(str2)>0,
+    if(abs(parse(str2)-ans)<0.01,
+	  Letter([2,0.3],"e","正解",["Size=1.2","Color=red"]);
+    ,
+	  Letter([2,0.3],"e","間違い",["Size=1.2","Color=red"]);
+	);
+  );
+  
+  ////////// 正解の設定 //////////
+  if(ansflg==1,
+    Expr([1.5,0.15],"e","S_{\Delta}="+text(ans)+"\,,",["Size=1.2","Color=red"]);
+	Expr([1.8,0.15],"e","S="+text(1/(parse(str0)+1)),["Size=1.2","Color=red"]);
+  );
+);

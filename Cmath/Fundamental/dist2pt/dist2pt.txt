@@ -1,0 +1,83 @@
+///////////// Initialization/KETlib //////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+ky="";
+
+ansflg=0;
+
+///////////// Draw/figures /////////////
+Ketinit();
+
+Setketcindyjs(["Sc=1","Label=[]","Color=offwhite"]);
+Ketcindyjsmain(["<pf10/fp>_;_;2点からの等距離"],[
+ "<pf5/fpbr>_;スライダーを動かし，等距離となる点の位置を探す．"
+]);
+
+Seteditable(30,["","Size=18","Width=50"]);
+Seteditable(31,["","Size=18","Width=50"]);
+Seteditable(32,["","Size=18","Width=50"]);
+
+//import("Graph1.txt");
+////////// 入力窓の設定 //////////
+str0="x"; //no ketjs
+//str0=Textedit(30); //only ketjs
+
+str1="3"; //no ketjs
+//str1=Textedit(31); //only ketjs
+
+str2="0"; //no ketjs
+//str2=Textedit(32); //only ketjs
+
+////////// xy座標の設定 //////////
+Setwindow([-10,10],[-10,10]);
+
+Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
+Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
+
+////////// 問題文の設定 //////////
+Letter([11,9.7],"e","2点A, Bから等距離にある",["Size=1.2"]);
+Letter([13.5,8.7],"e","軸上の点Pの座標は",["Size=1.2"]);
+Letter([11,6.7],"e","$\left(\right.$　　,　　$\left.\right)$",["Size=2.5"]);
+
+////////// グラフの設定 //////////
+Slider("Px",[-10,0],[10,0]);
+Slider("Py",[0,-10],[0,10]);
+Listplot("0",[A,B],["do"]);
+if(str0=="x",
+  Listplot("1",[A,Px,B]);
+);
+if(str0=="y",
+  Listplot("1",[A,Py,B]);
+);
+
+////////// 正解の設定 //////////
+if(str0=="x",
+  ans=text((B.x^2+B.y^2-A.x^2-A.y^2)/(2*(B.x-A.x)));
+  if((str1==ans)&(str2=="0"),
+    Letter([14,5],"e","正解",["Size=2","Color=red"]);
+  ,
+    Letter([14,5],"e","間違い",["Size=2","Color=red"]);
+  );
+);
+if(str0=="y",
+  ans=text((B.x^2+B.y^2-A.x^2-A.y^2)/(2*(B.y-A.y)));
+  if((str1=="0")&(str2==ans),
+    Letter([14,5],"e","正解",["Size=2","Color=red"]);
+  ,
+    Letter([14,5],"e","間違い",["Size=2","Color=red"]);
+  );
+);
+
+if(ansflg==1,
+  if(str0=="x",
+    Expr([13.5,3],"e","$("+ans+",0)$",["Size=2","Color=red"]);
+  );
+  if(str0=="y",
+    Expr([13.5,3],"e","$(0,"+ans+")$",["Size=2","Color=red"]);
+  );
+);
+
+Windispg();

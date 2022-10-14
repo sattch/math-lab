@@ -1,0 +1,98 @@
+Ketinit();
+
+Setketcindyjs(["Nol=all","Equal=","Axe=n"]);//no ketjs on
+prelist=[
+ "<p,f10>_;三角関数の値;%(or #)=pi"
+];
+Ketcindyjsbody(prelist,[]);// no ketjs off
+
+//Setwindow([0,5],[-0.5,3]);
+Addax(0);
+
+inspect(Text50,"text.text","="); //no ketjs on
+inspect(Text51,"text.text","=");
+inspect(Text52,"text.text","=");
+Movetojs(Text50,[1.1,3.5],24);
+Movetojs(Text51,[1.1,3.5-0.52],24);
+Movetojs(Text52,[1.1,3.5-0.52*2],24); //no ketjs off
+Expr([0.9,3.5],"w","\sin",["Size=2"]);
+Expr([0.9,3.5-0.52],"w","\cos",["Size=2"]);
+Expr([0.9,3.5-0.52*2],"w","\tan",["Size=2"]);
+
+Pointdata("1",[-0.2,3.55],["Size=5","Color=black"]);
+Pointdata("2",[-0.2,3.55-0.52],["Size=5","Color=red"]);
+Pointdata("3",[-0.2,3.55-0.52*2],["Size=5","Color=blue"]);
+
+center=[5,1];
+Circledata("1",[center,1],["dr,1.5"]);
+Listplot("h",[center+[-1.2,0],center+[1.2,0]]);
+Listplot("v",[center+[0,-1.2],center+[0,1.2]]);
+
+pos=1;
+pos2=0+0.55*3;
+win=[50,51,52];
+clr=["black","red","blue"];
+funL=["sin(","cos(","tan("];
+forall(1..(length(win)),
+  str="%/4";//no ketjs
+//  str=Textedit(win_#); //only ketjs
+  if(length(str)>0,
+    str=Removespace(str);
+    str=replace(str,"   ","*");
+    str=replace(str,"  ","*");
+    str=replace(str," ","*");
+    str=replace(str,"%","pi");
+    str=replace(str,"#","pi");
+    str=funL_#+str+")";
+    cstr=Tocindyform(str);
+    if(indexof(cstr,"?")==0,
+      tmp=Parlevel(cstr);
+      tmp1=select(tmp,#_2==1);
+      tmp1=tmp1_1_1;
+      tmp2=select(tmp,#_2==-1);
+      tmp2=tmp2_1_1;
+      tmp=substring(cstr,tmp1,tmp2-1);
+      ang=parse(tmp);
+      tmp2=center+[cos(ang),sin(ang)];
+      tmp3=[tmp2_1,1];
+      tmp4=[center_1,tmp2_2];
+      tmp="Color="+clr_#;
+      Listplot(text(#),[center,tmp2],[tmp]);
+      Listplot(text(#)+"da",[tmp3,tmp2,tmp4],["do",tmp]);
+      out=Getans(str);
+      Expr([0.3,pos2],"e",Totexform(str)+"="+out,["Size=1.8"]);
+    );
+  );
+  pos=pos-0.6;
+  pos2=pos2-0.55;
+);
+
+Windispg();
+
+if(1==0, //no ketjs on
+
+common=[
+  "ans1:ev(t,sol[1])",[],
+  "fans1:float(ans1)",[],
+  "ans2:ev(t,sol[2])",[],
+  "fans2:float(ans2)",[],
+  "ans3:ev(t,sol[3])",[],
+  "fans3:float(ans3)",[],
+  "ans1::ans2::ans3::fans1::fans2::fans3",[]
+];
+cmdLs=concat(["sol:solve(4*t^3-3*t+sqrt(3)/2=0,t)",[]],common);
+cmdLc=concat(["sol:solve(4*t^3-3*t-sqrt(1)/2=0,t)",[]],common);
+
+CalcbyM("ans1",cmdLs);
+tmp=replace(ans1_1,"%i","i");
+Mxtex("1",tmp,["Disp=n"]);
+Expr([0,3],"e",tx1);
+
+CalcbyM("ans2",cmdLc);
+tmp=replace(ans2_3,"%i","i");
+println(tmp);
+println(parse(tmp));
+Mxtex("2",tmp,["Disp=n"]);
+Expr([0,2],"e",tx1);
+
+);//fi no ketjs off

@@ -1,0 +1,55 @@
+Ketinit();
+Setketcindyjs(["Local=y","Nolabel=all","Color=offwhite"]);
+Ketcindyjsmain(["<pf10,fp>_;2次関数のグラフ"],[
+ "<pf5,fpbr>(1)_;$a$,$b$,$c$の値を代入し，2次関数を入力する．",
+ "<pf5,fp>(2)_;$a(x-p)^2+q$の形で代入し，グラフを一致させる．"
+]);
+Drwxy();
+
+ww=round(10);
+hh=round(10);
+xL0=apply(1..ww,10);
+yL0=apply(1..hh,10);
+Tabledata(xL0,yL0,[],[0,"do","Move=[-5,-5]"]);
+htick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+  htick=concat(htick,[#,text(#)]);
+);
+Htickmark(htick);
+vtick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+ vtick=concat(vtick,[#,text(#)]);
+);
+Vtickmark(vtick);
+
+str1="1";
+//str1=Textedit(51); only ketjs
+Movetojs(51,[6.5,5-0.15],15);
+Expr([6.5-0.1,5],"w","a=",["Size=1.4"]);
+str2="2";
+//str2=Textedit(52); only ketjs
+Movetojs(52,[6.5,4-0.15],15);
+Expr([6.5-0.1,4],"w","b=",["Size=1.4"]);
+str3="2";
+//str3=Textedit(53); only ketjs
+Movetojs(53,[6.5,3-0.15],15);
+Expr([6.5-0.1,3],"w","c=",["Size=1.4"]);
+tmp1=Tocindyform(str1);
+tmp2=Tocindyform(str2);
+tmp3=Tocindyform(str3);
+Plotdata("1",tmp1+"*x^2+"+tmp2+"*x+"+tmp3,"x",["Num=500"]);
+tmp1=Totexform(str1);
+tmp2=Totexform(str2);
+tmp3=Totexform(str3);
+Expr([5.5,2],"e","y="+tmp1+"x^2+"+tmp2+"x+"+tmp3,["Size=1.4"]);
+
+str4="x^2+2*x+2";
+//str4=Textedit(54); only ketjs
+Movetojs(54,[6.5,1-0.15],15);
+Expr([6.5-0.1,1],"w","y=",["Size=1.4"]);
+tmp4=Tocindyform(str4);
+Plotdata("2",tmp4,"x",["dr,1.5","Num=500","Color=blue"]);
+
+Windispg();

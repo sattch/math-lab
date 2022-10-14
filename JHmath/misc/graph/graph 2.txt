@@ -1,0 +1,42 @@
+Ketinit();
+Setketcindyjs(["No=all","Loc=y","Fig=y"]);
+Ketcindyjsbody(["<p,f10>_;関数のグラフ"],[]);
+Setwindow([-6.5,6.5],[-6.5,6.5]);
+
+ww=round(10);
+hh=round(10);
+xL0=apply(1..ww,10);
+yL0=apply(1..hh,10);
+Tabledata(xL0,yL0,[],[0,"dr,0.5","Move=[-5,-5]"]);
+htick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+  htick=concat(htick,[#,text(#)]);
+);
+Htickmark(htick,["Size=1.5"]);
+vtick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+ vtick=concat(vtick,[#,text(#)]);
+);
+Vtickmark(vtick,["Size=1.5"]);
+Addax(1);
+
+str="y=x^2";
+//str=Textedit(52); //only ketjs
+tmp=Strsplit(str,"=");
+if(length(tmp)>0,
+ if(length(tmp)==1,
+   fun=tmp_1;
+ ,
+   fun=tmp_2;
+ );
+ if(length(fun)>0,
+   tmp=Tocindyform(fun);
+   Plotdata("1",tmp,"x",["dr,1.5","Num=100","Color=blue"]);
+   tmp=Totexform(fun);
+   Expr([0.1,5.1],"ne","y="+tmp,["Size=1.5"]);
+ );
+);
+
+Windispg();

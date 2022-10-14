@@ -1,0 +1,45 @@
+Ketinit();
+Setketcindyjs(["Local=y","Nolabel=all","Color=offwhite","Equal="]);
+Ketcindyjsmain(["<pf10/fp>_;_;ベクトルの和・差・実数倍"],["<pf5/fbr>(1)_;3点A,B,Cを動かし，$\vec{\ a}$,$\vec{\ b}$,$\vec{\ c}$_;を定める．","<pf5/fp>(2)_;係数$L$,$M$,$N$の順で値を代入し，$\vec{\ p}$_;を確認する．"]);
+Addax(0);
+
+Putpoint("O",[0,0]);
+Putpoint("A",[1,0],[A.x,A.y]);
+Expr(A,"n","\vec{\ a}",["Size=1.5"]);
+Arrowdata("1",[O,A],[2,18,1,0.2]);
+Putpoint("B",[0,1],[B.x,B.y]);
+Expr(B,"n","\vec{\ b}",["Size=1.5"]);
+Arrowdata("2",[O,B],[2,18,1,0.2]);
+Putpoint("C",[-1,0],[C.x,C.y]);
+Expr(C,"n","\vec{\ c}",["Size=1.5"]);
+Arrowdata("3",[O,C],[2,18,1,0.2]);
+
+Expr([5,3],"e","\vec{\ a}",["Size=1.5"]);
+Letter([8-0.1,3],"w","の係数$L=$",["Size=1.5"]);
+str1="2";
+//str1=Textedit(51); only ketjs
+Movetojs(51,[8,3-0.2],15);
+Expr([5,1],"e","\vec{\ b}",["Size=1.5"]);
+Letter([8-0.1,1],"w","の係数$M=$",["Size=1.5"]);
+str2="3";
+//str2=Textedit(52); only ketjs
+Movetojs(52,[8,1-0.2],15);
+Expr([5,-1],"e","\vec{\ c}",["Size=1.5"]);
+Letter([8-0.1,-1],"w","の係数$N=$",["Size=1.5"]);
+str3="-2";
+//str3=Textedit(53); only ketjs
+Movetojs(53,[8,-1-0.2],15);
+Expr([6,5],"se","\vec{\ p}="+str1+"\vec{\ a}+"+str2+"\vec{\ b}+"+str3+"\vec{\ c}",["Size=1.5"]);
+
+Putpoint("P",parse(str1)*A+parse(str2)*B+parse(str3)*C);
+Expr(P,"n","\vec{\ p}",["Size=1.5"]);
+Arrowdata("4",[O,P],[2,18,1,0.2]);
+
+Listplot("da1",[O,parse(str1)*A],["da","Color=blue"]);
+Listplot("da2",[O,parse(str2)*B],["da","Color=blue"]);
+Listplot("da3",[parse(str1)*A,parse(str1)*A+parse(str2)*B,parse(str2)*B],["da","Color=blue"]);
+Listplot("da4",[O,parse(str1)*A+parse(str2)*B],["da","Color=red"]);
+Listplot("da5",[O,parse(str3)*C],["da","Color=red"]);
+Listplot("da6",[parse(str1)*A+parse(str2)*B,parse(str1)*A+parse(str2)*B+parse(str3)*C,parse(str3)*C],["da","Color=red"]);
+
+Windispg();

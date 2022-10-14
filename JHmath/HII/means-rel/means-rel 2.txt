@@ -1,0 +1,59 @@
+Ketinit();
+
+Setketcindyjs(["No=all","Loc=y","Fig=y"]);
+prelist=["<p,f10>_;相加平均と相乗平均の関係"];
+Ketcindyjsbody(prelist,[]);
+
+Setwindow([-6.5,16],[-6.5,6.5]);
+Addax(0);
+Listplot("x",[[-6.5,0],[6.5,0]]);
+Expr([6.5,0],"e1","x");
+Listplot("y",[[0,-6.5],[0,6.5]]);
+Expr([0,6.5],"n1","y");
+
+ww=round(10);
+hh=round(10);
+xL0=apply(1..ww,10);
+yL0=apply(1..hh,10);
+Tabledata(xL0,yL0,[],[0,"dr,0.5","Move=[-5,-5]"]);
+htick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+  htick=concat(htick,[#,""]);
+);
+Htickmark(htick,["Size=1.5"]);
+vtick=[];
+tmp=((-5)..(5));
+forall(remove(tmp,[0]),
+ vtick=concat(vtick,[#,""]);
+);
+Vtickmark(vtick,["Size=1.5"]);
+
+str1="1";
+//str1=Textedit(50); //only ketjs
+Expr([5.5,5],"e","a=",["Size=1.4","notex"]);
+str2="2";
+//str2=Textedit(51); //only ketjs
+Expr([5.5,3.5],"e","b=",["Size=1.4","notex"]);
+tmp1=Tocindyform(str1);
+tmp2=Tocindyform(str2);
+R=(parse(tmp1)+parse(tmp2))/2;
+Circledata("1",[[0,0],[R,0]]);
+Bowdata("a",[[-R,0],[-R+parse(tmp1),0]],[2,0.5,"E=a"]);
+Bowdata("b",[[-R+parse(tmp1),0],[R,0]],[2,0.5,"E=b"]);
+Listplot("1",[[0,0],[0,R]],["dr,2","Color=red"]);
+Bowdata("1",[[0,0],[0,R]],[2,0.5,"E=\dfrac{a+b}{2}"]);
+Listplot("2",[[-R+parse(tmp1),0],[-R+parse(tmp1),sqrt(R^2-(-R+parse(tmp1))^2)]],["dr,2","Color=blue"]);
+Listplot("3",[[-R+parse(tmp1),-sqrt(R^2-(-R+parse(tmp1))^2)],[-R+parse(tmp1),0]],["Color=blue"]);
+Bowdata("2",[[-R+parse(tmp1),sqrt(R^2-(-R+parse(tmp1))^2)],[-R+parse(tmp1),0]],[2,0.5,"E=x"]);
+Listplot("4",[[-R,0],[-R+parse(tmp1),sqrt(R^2-(-R+parse(tmp1))^2)],[R,0],[-R+parse(tmp1),-sqrt(R^2-(-R+parse(tmp1))^2)],[-R,0]],["da"]);
+
+Expr([5.5,2],"e","\dfrac{a+b}{2}="+text((parse(tmp1)+parse(tmp2))/2),["Size=1.4","notex"]);
+Expr([5.5,1],"e","x=\sqrt{ab}="+text(sqrt(parse(tmp1)*parse(tmp2))),["Size=1.4","notex"]);
+
+Letter([5.5,-1],"e","方べきの定理より",["Size=1.4","notex"]);
+Expr([5.5,-2],"e","x^2=\sqrt{ab}\ \Longleftrightarrow\ x=\sqrt{ab}",["Size=1.4","notex"]);
+Letter([5.5,-3],"e","相加平均と相乗平均の関係は",["Size=1.4","notex"]);
+Expr([5.5,-4],"e","\dfrac{a+b}{2}\geq\sqrt{ab}",["Size=1.4","notex"]);
+
+Windispg();

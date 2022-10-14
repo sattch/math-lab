@@ -1,0 +1,53 @@
+Ketinit();
+Setketcindyjs(["Local=y","Scale=1","Nolabel=all","Color=offwhite","Figure=y","Equal="]);
+Ketcindyjsmain(["<pf10/fp>_;_;たすき掛けの練習"],[
+ "<pf5/fpbr>_;(1)_;2次式を入力する．",
+ "<pf5/fpbr>_;(2)_;$A$,$B$,$C$,$D$の値を入力する．"
+]);
+Addax(0);
+
+Letter([11-0.1,4],"w","$x^2$の係数");
+str1="2";
+Letter([11-0.1,3],"w","$x$の係数");
+str2="-1";
+Letter([11-0.1,2],"w","定数項");
+str3="-1";
+Expr([11-0.1,1],"w","A=");
+str4="2";
+Expr([11-0.1,0],"w","C=");
+str5="1";
+Expr([11-0.1,-1],"w","B=");
+str6="1";
+Expr([11-0.1,-2],"w","D=");
+str7="-2";
+//str1=Textedit(51); only ketjs on
+//str2=Textedit(52); 
+//str3=Textedit(53); 
+//str4=Textedit(54); 
+//str5=Textedit(55); 
+//str6=Textedit(56); 
+//str7=Textedit(57); 
+//Movetojs(1,[11,4-0.15],15);
+//Movetojs(2,[11,3-0.15],15);
+//Movetojs(3,[11,2-0.15],15);
+//Movetojs(4,[11,1-0.15],15);
+//Movetojs(5,[11,0-0.15],15);
+//Movetojs(6,[11,-1-0.15],15);
+//Movetojs(7,[11,-2-0.15],15); only ketjs off
+
+Expr([1,4],"e",str1+"x^2+"+str2+"x+"+str3+"=("+str4+"x+"+str6+")("+str5+"x+"+str7+")");
+Expr([1,3],"e",str4);
+Expr([1,2],"e",str5);
+Expr([3.5,3],"e",str6);
+Expr([3.5,2],"e",str7);
+Expr([6,3],"e",text(parse(str5)*parse(str6)));
+Expr([6,2],"e",text(parse(str4)*parse(str7)));
+Expr([6,0],"e",text(parse(str5)*parse(str6)+parse(str4)*parse(str7)));
+
+Listplot("1",[[2,3],[3,2]]);
+Listplot("2",[[2,2],[3,3]]);
+Listplot("3",[[1,1],[7,1]]);
+Arrowdata("1",[[4.5,3],[5.5,3]],[1,18,1,0.2]);
+Arrowdata("2",[[4.5,2],[5.5,2]],[1,18,1,0.2]);
+
+Windispg();

@@ -1,0 +1,99 @@
+/////////////KETlib///////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+setdirectory(Dircdy);
+import("ketcindylibkey.cs");
+import("linear-tformlib.txt");
+import("button.txt");
+
+Seteditable(10,["","Size=22","Width=300"]);//no ketjs on
+Text10.xy=[7.2,3];//no ketjs off
+
+/////////////flag等/////////////
+funflg=0;
+startflg=0;
+startnew=-1;
+
+/////////////////figures/////////////////
+Ketinit(1);
+
+poy=3.6;
+drwt(line,str):=(
+  drawtext([-3,poy]," "+line+" "+str,size->15);
+  poy=poy-0.8;
+);
+
+if(startflg==0,
+  if(startflg!=startnew,
+    Subsedit(10,"");
+  );
+  startnew=startflg;
+);
+
+//////////////キーボード・ボタン等//////////////
+Keytable(4,12,1,12,[6,1.25],[0,1,0],nameL1,[0,-0.2],22);
+Keytable(4,12,4,12,[6,-3.55],[1,1,0],nameL2,[0,-0.2],22);
+
+////////////////string入力窓/////////////////
+if(funflg==1,
+  if(contains(Manifun,name),
+    parse(name+";");
+  ,
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
+    out=Addfunstr(name,npos,Str);
+    tmp=length(out_1)-length(Str);
+    npos=npos+tmp;
+    Str=out_1; //npos=out_2;
+    if(npos<length(Str),
+      tmp=replace(Str,"?","");
+      tmp1=substring(tmp,0,npos-1)+"?";
+      Str=tmp1+substring(tmp,npos-1,length(tmp));
+    );
+  );
+  Subsedit(10,Str);
+  funflg=0;
+);
+
+Str=Textedit(10,"","");
+Str=replace(Str,"frfr","tfr");
+Strnq=replace(Str,"?","");
+if(Strnq!=Strnow,
+  Strnow=Strnq;
+);
+
+Expr([6,3.2],"e","A=",["Size=1.2"]);
+
+///////////////変換図/////////////
+Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
+Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
+
+if(startflg==1,
+  tmp=Tocindyform(Strnq);
+  tmpL=Strsplit(tmp,",");
+  A11=parse(tmpL_1); A12=parse(tmpL_2); A21=parse(tmpL_3); A22=parse(tmpL_4);
+  xL=XMIN..XMAX;
+  yL=YMIN..YMAX;
+  forall(1..length(xL),m,
+    forall(1..length(yL),n,
+      P=[xL_m,yL_n];
+      Q=[A11*xL_m+A12*yL_n,A21*xL_m+A22*yL_n];
+      if(mod(m,3)==0,
+        Arrowdata(text(m)+text(n),[P,Q],[1.5,"dr,0.5"]);
+      );
+      if(mod(m,3)==1,
+        Arrowdata(text(m)+text(n),[P,Q],[1.5,"dr,0.5","Color=blue"]);
+      );
+      if(mod(m,3)==2,
+        Arrowdata(text(m)+text(n),[P,Q],[1.5,"dr,0.5","Color=red"]);
+      );
+    );
+  );
+);
+
+Windispg();
+
+//Help("Tocindyform");

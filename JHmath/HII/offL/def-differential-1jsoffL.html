@@ -294,98 +294,75 @@ Strsplit(strorg,key):=( // 210422 renewed
   );
   out;
 );
-Derivative(pdstr,ptinfo):=Derivative(pdstr,ptinfo,[]);//180719
-Derivative(Arg1,Arg2,Arg3):=(//1807120
-  regional(pdstr,ptinfo,options,name,v,pt,par,p0,p1,p2,p3,
-     pQ,pR,cc,m1,m2,out,tmp,tmp1,reL,ch,flg);
-  if(!islist(Arg3),
-    Derivative(Arg1,Arg2,Arg3,[]);
+Slider(ptstr,p1,p2):=Slider(ptstr,p1,p2,[]);
+Slider(ptstr,p1,p2,optionsorg):=(//220903
+  regional(pA,pB,pC,options,color,thick,sep,
+        tmp,tmp1,tmp2);
+  options=optionsorg;
+  color="Color=0.6*[0,0,1]"; //190120from
+  thick="size->2";
+  sep=0.3; //190824
+  forall(options,
+    tmp=Toupper(substring(#,0,1));
+    if(tmp=="C",
+      color=#;
+      options=remove(options,[tmp]);//220903
+    );
+    if(tmp=="T",
+      tmp=Strsplit(#,"=");
+      thick="size->"+tmp_2;
+      options=remove(options,[tmp]);//220903
+    );
+    if(tmp=="S",//190824from
+      tmp=Strsplit(#,"=");
+      sep=parse(tmp_2);
+      options=remove(options,[tmp]);//220903
+    ); //190824to
+  );
+  tmp=Indexall(ptstr,"-");
+  if(length(tmp)>0,
+    pA=substring(ptstr,0,tmp_1-1); //190824from
+    pC=substring(ptstr,tmp_1,tmp_2-1);
+    pB=substring(ptstr,tmp_2,length(ptstr));
+    parse(pA).xy=p1;
+    parse(pB).xy=p2; //190824to
+    tmp1=pC+"position"; //190827from
+    if(!islist(parse(tmp1)),
+      tmp2=parse(pC).xy;
+      if(|tmp2-p1|<0.1,tmp2=p1+0.1*(p2-p1)/|p2-p1|);
+      if(|tmp2-p2|<0.1,tmp2=p2+0.1*(p1-p2)/|p1-p2|);
+      tmp=tmp1+"="+textformat(tmp2,10)+";";
+      parse(tmp);
+      parse(pC).xy=tmp2;
+    ); //190827to
+    PTEXCEPTION=concat(TEXCEPTION,[pA,pC,pB]);
   ,
-    pdstr=Arg1; ptinfo=Arg2; options=Arg3;
-    tmp=Divoptions(options);
-    reL=tmp_5;
-    ch=1;
-    if(length(reL)>0,
-      ch=reL_1;
-      options=remove(options,reL);
-    );
-    flg=0;//1807120
-    name="";
-    if(isstring(ptinfo),
-      tmp=Strsplit(ptinfo,"=");
-      name=Toupper(substring(tmp_1,0,1));
-      v=parse(tmp_2);
-      if(name=="X",
-        p1=[v,0] ; p2=[v,1];  //200516from
-        tmp=100/dist(p1,p2)*(p2-p1);
-        tmp1=Listplot("",[p1-tmp,p2+tmp],["nodata"]);
-      ,
-        p1=[0,v] ; p2=[1,v]; 
-        tmp=100/dist(p1,p2)*(p2-p1);
-        tmp1=Listplot("",[p1-tmp,p1+tmp],["nodata"]);
-      ); //200516to
-      tmp=Intersectcurvespp(pdstr,tmp1);
-      if(length(tmp)==0,
-         println("    Derivative cannot be found");
-         out="";
-         flg=1;
-      ,
-        tmp=sort(tmp,[#_3]);
-        pt=tmp_ch_1;
-        par=tmp_ch_2;
-      );
-    ,
-      pt=ptinfo_1;
-      par=ptinfo_2;
-    );
+    pC=ptstr; pA=pC+"l"; pB=pC+"r"; 
+    PTEXCEPTION=concat(PTEXCEPTION,[pC]);
+  );
+  options=concat(options,["Msg=n",color,thick]); //220903[2lines]
+  if(!contains(options,"nodisp"),options=append(options,"notex"));
+  Listplot(pA+pB,[p1,p2],options);
+  Putonseg(pC,parse("sg"+pA+pB));
+);
+Indexall(str,key):=(
+  regional(rest,out,flg,tmp,tmp1,);
+  out=[];
+  rest=str;
+  flg=0;
+  forall(1..(length(str)),
     if(flg==0,
-      p0=Pointoncurve(par-1,pdstr);
-      p1=pt;
-      p2=Pointoncurve(par+1,pdstr);
-      p3=Pointoncurve(par+2,pdstr);
-      tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
-      cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
-      pQ=p1+cc*(p2-p0);
-      pR=p2+cc*(p1-p3);
-      m1=-p1_1+pQ_1;
-      m2=-p1_2+pQ_2;
-      if(name=="",out=[m1,m2]);
-      if(name=="X",out=m2/m1);
-      if(name=="Y",out=m1/m2);
-    );
-    out;
-  );
-);//180720to
-Derivative(fun,var,value,options):=(
-  regional(eqL,method,eps,str,x1,x2,y1,y2,tmp,tmp1,tmp2);
-  method="N";
-  tmp=Divoptions(options);
-  eqL=tmp_5;
-  forall(eqL,
-    tmp=indexof(#,"=");//220823
-    tmp1=Toupper(substring(#,0,1));
-    tmp2=substring(#,tmp,tmp+1);
-    if(tmp1=="M",
-      method=Toupper(tmp2);
+      tmp=indexof(rest,key);
+      if(tmp>0,
+        tmp1=tmp+length(str)-length(rest);
+        out=append(out,tmp1);
+        rest=substring(rest,tmp,length(rest));
+      ,
+        flg=1;
+      );
     );
   );
-  if(method=="D",
-    str="d"+PaO();
-    str=str+replace(fun,var,"#")+",";
-    str=str+value+")";
-    tmp=Pcrd([1,parse(str)]);  // 14.11.08
-    tmp_2;
-  );
-  if(method=="N",
-    eps=10^(-6);
-    x1=max(XMIN,value-eps);
-    x2=min(XMAX,value+eps);
-    tmp=Assign(fun,[var,"("+format(x1,6)+")"]);//180408
-    y1=parse(tmp);
-    tmp=Assign(fun,[var,"("+format(x2,6)+")"]);//180408
-    y2=parse(tmp);
-    (y2-y1)/(x2-x1);
-  );
+  out;
 );
 Listplot(list):=Listplot(list,[]);
 Listplot(Arg1,Arg2):=(
@@ -776,6 +753,133 @@ Lcrd(pt):=(
   );
   re(tmp); //191231
 );
+Putonseg(name,sgstr):=(
+  regional(seg,p1,p2);
+  if(isstring(sgstr),seg=parse(sgstr),seg=sgstr);
+  Putonseg(name,LLcrd(seg_1),LLcrd(seg_2));
+);
+Putonseg(name,p1,p2):=Putonseg(name,p1,p2,[]);
+Putonseg(name,p1org,p2org,options):=(
+  regional(Eps,par,p1,p2,dx,dy,p,tmp,tmp1,tmp2);
+  Eps=10^(-5);
+  par=0.5;
+  tmp=Divoptions(options);
+  if(length(tmp_6)>0,
+    par=tmp_6_1;
+  );
+  p1=Lcrd(p1org);//16.10.11from
+  p2=Lcrd(p2org);
+  p1=Pcrd(p1); p2=Pcrd(p2); //190120
+  dx=p2_1-p1_1;
+  dy=p2_2-p1_2;
+  p=parse(name+".xy");
+  if(abs(dx)>abs(dy), //190120from
+    if(p1_1>p2_1,tmp=p1;p1=p2;p2=tmp);
+    if(p_1<p1_1,parse(name+".xy="+Textformat(p1,10));p=p1);
+    if(p_1>p2_1,parse(name+".xy="+Textformat(p2,10));p=p2);
+    tmp=(p2_2-p1_2)/(p2_1-p1_1)*(p_1-p1_1)+p1_2;
+    parse(name+".y="+tmp+";"); //190415
+  ,
+    if(p1_2>p2_2,tmp=p1;p1=p2;p2=tmp);
+    if(p_2<p1_2,parse(name+".xy="+Textformat(p1,10));p=p1);
+    if(p_2>p2_2,parse(name+".xy="+Textformat(p2,10));p=p2);
+    tmp=(p2_1-p1_1)/(p2_2-p1_2)*(p_2-p1_2)+p1_1;
+    parse(name+".x="+tmp+";"); //190415
+  ); //190120to
+);
+Derivative(pdstr,ptinfo):=Derivative(pdstr,ptinfo,[]);//180719
+Derivative(Arg1,Arg2,Arg3):=(//1807120
+  regional(pdstr,ptinfo,options,name,v,pt,par,p0,p1,p2,p3,
+     pQ,pR,cc,m1,m2,out,tmp,tmp1,reL,ch,flg);
+  if(!islist(Arg3),
+    Derivative(Arg1,Arg2,Arg3,[]);
+  ,
+    pdstr=Arg1; ptinfo=Arg2; options=Arg3;
+    tmp=Divoptions(options);
+    reL=tmp_5;
+    ch=1;
+    if(length(reL)>0,
+      ch=reL_1;
+      options=remove(options,reL);
+    );
+    flg=0;//1807120
+    name="";
+    if(isstring(ptinfo),
+      tmp=Strsplit(ptinfo,"=");
+      name=Toupper(substring(tmp_1,0,1));
+      v=parse(tmp_2);
+      if(name=="X",
+        p1=[v,0] ; p2=[v,1];  //200516from
+        tmp=100/dist(p1,p2)*(p2-p1);
+        tmp1=Listplot("",[p1-tmp,p2+tmp],["nodata"]);
+      ,
+        p1=[0,v] ; p2=[1,v]; 
+        tmp=100/dist(p1,p2)*(p2-p1);
+        tmp1=Listplot("",[p1-tmp,p1+tmp],["nodata"]);
+      ); //200516to
+      tmp=Intersectcurvespp(pdstr,tmp1);
+      if(length(tmp)==0,
+         println("    Derivative cannot be found");
+         out="";
+         flg=1;
+      ,
+        tmp=sort(tmp,[#_3]);
+        pt=tmp_ch_1;
+        par=tmp_ch_2;
+      );
+    ,
+      pt=ptinfo_1;
+      par=ptinfo_2;
+    );
+    if(flg==0,
+      p0=Pointoncurve(par-1,pdstr);
+      p1=pt;
+      p2=Pointoncurve(par+1,pdstr);
+      p3=Pointoncurve(par+2,pdstr);
+      tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
+      cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
+      pQ=p1+cc*(p2-p0);
+      pR=p2+cc*(p1-p3);
+      m1=-p1_1+pQ_1;
+      m2=-p1_2+pQ_2;
+      if(name=="",out=[m1,m2]);
+      if(name=="X",out=m2/m1);
+      if(name=="Y",out=m1/m2);
+    );
+    out;
+  );
+);//180720to
+Derivative(fun,var,value,options):=(
+  regional(eqL,method,eps,str,x1,x2,y1,y2,tmp,tmp1,tmp2);
+  method="N";
+  tmp=Divoptions(options);
+  eqL=tmp_5;
+  forall(eqL,
+    tmp=indexof(#,"=");//220823
+    tmp1=Toupper(substring(#,0,1));
+    tmp2=substring(#,tmp,tmp+1);
+    if(tmp1=="M",
+      method=Toupper(tmp2);
+    );
+  );
+  if(method=="D",
+    str="d"+PaO();
+    str=str+replace(fun,var,"#")+",";
+    str=str+value+")";
+    tmp=Pcrd([1,parse(str)]);  // 14.11.08
+    tmp_2;
+  );
+  if(method=="N",
+    eps=10^(-6);
+    x1=max(XMIN,value-eps);
+    x2=min(XMAX,value+eps);
+    tmp=Assign(fun,[var,"("+format(x1,6)+")"]);//180408
+    y1=parse(tmp);
+    tmp=Assign(fun,[var,"("+format(x2,6)+")"]);//180408
+    y2=parse(tmp);
+    (y2-y1)/(x2-x1);
+  );
+);
 Intersectcurvespp(crv1org,crv2org):=Intersectcurvespp(crv1org,crv2org,[]);
 Intersectcurvespp(crv1org,crv2org,options):=(
   regional(Eps,Eps1,Eps2,Dist,crv1,crv2,ii,jj,seg1,seg2,self,loopL,out,
@@ -1159,25 +1263,6 @@ Measuredepth(list):=( //190423
   );
   nn;
 );
-Indexall(str,key):=(
-  regional(rest,out,flg,tmp,tmp1,);
-  out=[];
-  rest=str;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      tmp=indexof(rest,key);
-      if(tmp>0,
-        tmp1=tmp+length(str)-length(rest);
-        out=append(out,tmp1);
-        rest=substring(rest,tmp,length(rest));
-      ,
-        flg=1;
-      );
-    );
-  );
-  out;
-);
 Bezierpt(t,ptlist,ctrlist):=(
   regional(flg3,p0,p1,p2,p3,p4,p5,p6,p7,p8,p9);
   p0=ptlist_1;
@@ -1456,91 +1541,6 @@ PaO(Arg):=(
     );
   );
   out;
-);
-Slider(ptstr,p1,p2):=Slider(ptstr,p1,p2,[]);
-Slider(ptstr,p1,p2,optionsorg):=(//220903
-  regional(pA,pB,pC,options,color,thick,sep,
-        tmp,tmp1,tmp2);
-  options=optionsorg;
-  color="Color=0.6*[0,0,1]"; //190120from
-  thick="size->2";
-  sep=0.3; //190824
-  forall(options,
-    tmp=Toupper(substring(#,0,1));
-    if(tmp=="C",
-      color=#;
-      options=remove(options,[tmp]);//220903
-    );
-    if(tmp=="T",
-      tmp=Strsplit(#,"=");
-      thick="size->"+tmp_2;
-      options=remove(options,[tmp]);//220903
-    );
-    if(tmp=="S",//190824from
-      tmp=Strsplit(#,"=");
-      sep=parse(tmp_2);
-      options=remove(options,[tmp]);//220903
-    ); //190824to
-  );
-  tmp=Indexall(ptstr,"-");
-  if(length(tmp)>0,
-    pA=substring(ptstr,0,tmp_1-1); //190824from
-    pC=substring(ptstr,tmp_1,tmp_2-1);
-    pB=substring(ptstr,tmp_2,length(ptstr));
-    parse(pA).xy=p1;
-    parse(pB).xy=p2; //190824to
-    tmp1=pC+"position"; //190827from
-    if(!islist(parse(tmp1)),
-      tmp2=parse(pC).xy;
-      if(|tmp2-p1|<0.1,tmp2=p1+0.1*(p2-p1)/|p2-p1|);
-      if(|tmp2-p2|<0.1,tmp2=p2+0.1*(p1-p2)/|p1-p2|);
-      tmp=tmp1+"="+textformat(tmp2,10)+";";
-      parse(tmp);
-      parse(pC).xy=tmp2;
-    ); //190827to
-    PTEXCEPTION=concat(TEXCEPTION,[pA,pC,pB]);
-  ,
-    pC=ptstr; pA=pC+"l"; pB=pC+"r"; 
-    PTEXCEPTION=concat(PTEXCEPTION,[pC]);
-  );
-  options=concat(options,["Msg=n",color,thick]); //220903[2lines]
-  if(!contains(options,"nodisp"),options=append(options,"notex"));
-  Listplot(pA+pB,[p1,p2],options);
-  Putonseg(pC,parse("sg"+pA+pB));
-);
-Putonseg(name,sgstr):=(
-  regional(seg,p1,p2);
-  if(isstring(sgstr),seg=parse(sgstr),seg=sgstr);
-  Putonseg(name,LLcrd(seg_1),LLcrd(seg_2));
-);
-Putonseg(name,p1,p2):=Putonseg(name,p1,p2,[]);
-Putonseg(name,p1org,p2org,options):=(
-  regional(Eps,par,p1,p2,dx,dy,p,tmp,tmp1,tmp2);
-  Eps=10^(-5);
-  par=0.5;
-  tmp=Divoptions(options);
-  if(length(tmp_6)>0,
-    par=tmp_6_1;
-  );
-  p1=Lcrd(p1org);//16.10.11from
-  p2=Lcrd(p2org);
-  p1=Pcrd(p1); p2=Pcrd(p2); //190120
-  dx=p2_1-p1_1;
-  dy=p2_2-p1_2;
-  p=parse(name+".xy");
-  if(abs(dx)>abs(dy), //190120from
-    if(p1_1>p2_1,tmp=p1;p1=p2;p2=tmp);
-    if(p_1<p1_1,parse(name+".xy="+Textformat(p1,10));p=p1);
-    if(p_1>p2_1,parse(name+".xy="+Textformat(p2,10));p=p2);
-    tmp=(p2_2-p1_2)/(p2_1-p1_1)*(p_1-p1_1)+p1_2;
-    parse(name+".y="+tmp+";"); //190415
-  ,
-    if(p1_2>p2_2,tmp=p1;p1=p2;p2=tmp);
-    if(p_2<p1_2,parse(name+".xy="+Textformat(p1,10));p=p1);
-    if(p_2>p2_2,parse(name+".xy="+Textformat(p2,10));p=p2);
-    tmp=(p2_1-p1_1)/(p2_2-p1_2)*(p_2-p1_2)+p1_1;
-    parse(name+".x="+tmp+";"); //190415
-  ); //190120to
 );
 Pointdata(nm,list):=Pointdata(nm,list,[]);
 Pointdata(nm,listorg,optionsorg):=(
@@ -2450,28 +2450,29 @@ if(length(tmp1_2)>0,
   Pointdata("1",[aa,f(aa)],["Size=2"]);
   Listplot("1",[[aa,0],pt1_1],["do"]);
   Htickmark([aa,"a"]);
-  mm=Derivative(gr1,"x="+text(aa));
-);
-
-Slider("X",[XMIN,-1.5],[XMAX,-1.5]);
-Pointdata("s1",[aa,-1.5],["Size=2"]);
-Expr(pts1_1,"n1","a");
-xx=X.x;
-eps=10^(-2);
-if(abs(xx-aa)>eps,
-  Pointdata("2",[xx,f(xx)],["Size=2"]);
-  Listplot("2",[[xx,0],pt2_1],["do"]);
-  Htickmark([xx,"x"]);
-  Lineplot("1",[pt1_1,pt2_1]);
-  Expr([4.25,3.5],"ne","x-a="+text(xx-aa));
-  Expr([4.25,3],"ne","\dfrac{f(x)-f(a)}{x-a}="+text((f(xx)-f(aa))/(xx-aa)));
-,
-  Plotdata("2",text(mm)+"*(x-"+text(aa)+")+"+text(f(aa)),"x",["Color=blue"]);
-  Expr([4.25,3.5],"ne","x-a=0");
 );
 
 if((length(tmp0_2)>0)&(length(tmp1_2)>0),
+  Slider("X",[XMIN,-1.5],[XMAX,-1.5]);
+  Pointdata("s1",[aa,-1.5],["Size=2"]);
+  Expr(pts1_1,"n1","a");
+  xx=X.x;
+  eps=10^(-2);
+  mm=Derivative(gr1,"x="+text(aa));
   Expr([4.25,2.5],"ne","f'(a)="+text(mm),["Color=blue"]);
+
+  if(abs(xx-aa)>eps,
+    Pointdata("2",[xx,f(xx)],["Size=2"]);
+    Listplot("2",[[xx,0],pt2_1],["do"]);
+    Htickmark([xx,"x"]);
+    Lineplot("1",[pt1_1,pt2_1]);
+    Expr([4.25,3.5],"ne","x-a="+text(xx-aa));
+    Expr([4.25,3],"ne","\dfrac{f(x)-f(a)}{x-a}="+text((f(xx)-f(aa))/(xx-aa)));
+  ,
+    Plotdata("2",text(mm)+"*(x-"+text(aa)+")+"+text(f(aa)),"x",["Color=blue"]);
+    Expr([4.25,3.5],"ne","x-a=0");
+  );
+
 );
 
 Windispg();
@@ -2502,8 +2503,8 @@ var cdy = CindyJS({
   ports: [{
     id: "CSCanvas",
     width: 830,
-    height: 689,
-    transform: [{visibleRect: [-1.7522800475813451, 4.764690328841133, 6.088110461812273, -1.7437784193181483]}],
+    height: 672,
+    transform: [{visibleRect: [-1.7522800475813447, 4.756188700577936, 6.088110461812273, -1.5916937359431622]}],
     grid: 0.5,
     background: "rgb(247,247,247)"
   }],

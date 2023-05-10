@@ -1,7 +1,6 @@
 Ketinit();
 
 Setketcindyjs(["Label=[X]","Color=offwhite"]);
-Ketcindyjsmain(["<pf10/fp>_;_;微分係数の定義(1)"],["<pf5/fp>関数の式と$a$の値を代入して，平均変化率が微分係数に近づく様子を確認する．"]);
 Seteditable(50,["y=","Size=18","Width=100"]);
 Movetojs(Text50,[-1.5,4.5],18); //only ketjs
 Seteditable(51,["a=","Size=18","Width=50"]);
@@ -25,13 +24,15 @@ if(length(tmp1_2)>0,
   Pointdata("1",[aa,f(aa)],["Size=2"]);
   Listplot("1",[[aa,0],pt1_1],["do"]);
   Htickmark([aa,"a"]);
+  mm=Derivative(gr1,"x="+text(aa));
 );
+
 
 Slider("X",[XMIN,-1.5],[XMAX,-1.5]);
 Pointdata("s1",[aa,-1.5],["Size=2"]);
 Expr(pts1_1,"n1","a");
 xx=X.x;
-eps=10^(-3);
+eps=10^(-2);
 if(abs(xx-aa)>eps,
   Pointdata("2",[xx,f(xx)],["Size=2"]);
   Listplot("2",[[xx,0],pt2_1],["do"]);
@@ -40,7 +41,6 @@ if(abs(xx-aa)>eps,
   Expr([4.25,3.5],"ne","x-a="+text(xx-aa));
   Expr([4.25,3],"ne","\dfrac{f(x)-f(a)}{x-a}="+text((f(xx)-f(aa))/(xx-aa)));
 ,
-  mm=Derivative(gr1,"x="+text(aa));
   Plotdata("2",text(mm)+"*(x-"+text(aa)+")+"+text(f(aa)),"x",["Color=blue"]);
   Expr([4.25,3.5],"ne","x-a=0");
 );

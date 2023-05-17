@@ -1,0 +1,139 @@
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+wflg=0;
+rflg=0;
+
+///////////////////////////////////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1.2"]);
+Setwindow([-5,5],[-9,9]);
+Addax(0);
+Seteditable(50,["y=","Size=18","Width=100"]);
+Seteditable(51,["","Size=18","Width=200"]);
+
+Slider("X",[XMIN,0],[XMAX,0]);
+inspect(X,"ptsize","5.1");
+Expr(X.xy,"n3","x="+text(X.x),["Size=1.5"]);
+Htickmark([-5,"",-4,"-4",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"4",5,""]);
+
+Listplot("x1",[[XMIN,5],[XMAX,5]],["dr,0.75"]);
+Expr([XMAX,5],"e","x");
+Listplot("y1",[[0,1],[0,YMAX]],["dr,0.75"]);
+Expr([0,YMAX],"n","y");
+Letter([0,5],"sw","O");
+Expr([[0,1],"w1","-4",[0,9],"w1","4"]);
+y1L=-3..3;
+y1L=y1L--[0];
+forall(1..length(y1L),
+  Listplot("ty1"+text(#),[[-0.05,y1L_#+5],[0.05,y1L_#+5]]);
+);
+Expr([[-4,5],"s1","-4",[4,5],"s1","4"]);
+x1L=-5..5;
+x1L=x1L--[0];
+forall(1..length(x1L),
+  Listplot("tx1"+text(#),[[x1L_#,5-0.05],[x1L_#,5+0.05]]);
+);
+
+str="y=x^2";
+//str=Textedit(50,str,""); //only ketjs
+tmp=Strsplit(str,"=");
+if(length(tmp_2)>0,
+  Deffun("f(x)",["regional(y)","y="+tmp_2+"+5","y"]);
+  Plotdata("1","f(x)","x",["Num=200"]);
+  Putoncurve("P","gr1");
+  P.x=X.x; P.y=f(X.x);
+  dc=Derivative(gr1,"x="+text(P.x));
+  fn=Assign("mm*(x-x0)+f(x0)",["mm",dc,"x0",P.x]);
+  xrng=Assign("x=[aa,bb]",["aa",P.x-0.5,"bb",P.x+0.5]);
+  Plotdata("2",fn,xrng,["Color=blue"]);
+  Expr(P.xy,"n3","m="+format(dc,1),["Size=1.5","Color=blue"]);
+);
+
+Listplot("x2",[[XMIN,-5],[XMAX,-5]],["dr,0.75"]);
+Expr([XMAX,-5],"e","x");
+Listplot("y2",[[0,YMIN],[0,-1]],["dr,0.75"]);
+Expr([0,-1],"n","y'");
+Letter([0,-5],"sw","O");
+Expr([[0,-9],"w1","-4",[0,-1],"w1","4"]);
+y2L=-4..4;
+y2L=y2L--[0];
+forall(1..length(y2L),
+  Listplot("ty2"+text(#),[[-0.05,y2L_#-5],[0.05,y2L_#-5]]);
+);
+Expr([[-4,-5],"s1","-4",[4,-5],"s1","4"]);
+x2L=-5..5;
+x2L=x2L--[0];
+forall(1..length(x2L),
+  Listplot("tx2"+text(#),[[x2L_#,-5-0.05],[x2L_#,-5+0.05]]);
+);
+
+
+dL=-10..10;
+dL=apply(dL,#*0.5);
+forall(1..length(dL),
+  Listplot("do"+text(#),[[dL_#,-9],[dL_#,-1]],["do"]);
+);
+Putpoint("Q1",[-5,-5],[-5,Q1.y]);
+Expr(Q1,"n3","1",["Size=1"]);
+Putpoint("Q2",[-4.5,-5],[-4.5,Q2.y]);
+Expr(Q2,"n3","2",["Size=1"]);
+Putpoint("Q3",[-4,-5],[-4,Q3.y]);
+Expr(Q3,"n3","3",["Size=1"]);
+Putpoint("Q4",[-3.5,-5],[-3.5,Q4.y]);
+Expr(Q4,"n3","4",["Size=1"]);
+Putpoint("Q5",[-3,-5],[-3,Q5.y]);
+Expr(Q5,"n3","5",["Size=1"]);
+Putpoint("Q6",[-2.5,-5],[-2.5,Q6.y]);
+Expr(Q6,"n3","6",["Size=1"]);
+Putpoint("Q7",[-2,-5],[-2,Q7.y]);
+Expr(Q7,"n3","7",["Size=1"]);
+Putpoint("Q8",[-1.5,-5],[-1.5,Q8.y]);
+Expr(Q8,"n3","8",["Size=1"]);
+Putpoint("Q9",[-1,-5],[-1,Q9.y]);
+Expr(Q9,"n3","9",["Size=1"]);
+Putpoint("Q10",[-0.5,-5],[-0.5,Q10.y]);
+Expr(Q10,"n3","10",["Size=1"]);
+Putpoint("Q11",[0,-5],[0,Q11.y]);
+Expr(Q11,"n3","11",["Size=1"]);
+Putpoint("Q12",[0.5,-5],[0.5,Q12.y]);
+Expr(Q12,"n3","12",["Size=1"]);
+Putpoint("Q13",[1,-5],[1,Q13.y]);
+Expr(Q13,"n3","13",["Size=1"]);
+Putpoint("Q14",[1.5,-5],[1.5,Q14.y]);
+Expr(Q14,"n3","14",["Size=1"]);
+Putpoint("Q15",[2,-5],[2,Q15.y]);
+Expr(Q15,"n3","15",["Size=1"]);
+Putpoint("Q16",[2.5,-5],[2.5,Q16.y]);
+Expr(Q16,"n3","16",["Size=1"]);
+Putpoint("Q17",[3,-5],[3,Q17.y]);
+Expr(Q17,"n3","17",["Size=1"]);
+Putpoint("Q18",[3.5,-5],[3.5,Q18.y]);
+Expr(Q18,"n3","18",["Size=1"]);
+Putpoint("Q19",[4,-5],[4,Q19.y]);
+Expr(Q19,"n3","19",["Size=1"]);
+Putpoint("Q20",[4.5,-5],[4.5,Q20.y]);
+Expr(Q20,"n3","20",["Size=1"]);
+Putpoint("Q21",[5,-5],[5,Q21.y]);
+Expr(Q21,"n3","21",["Size=1"]);
+
+Letter([5.5,4],"e","(1) スライダーを動かして",["Size=1"]);
+Letter([5.5,3],"e","　 接線の傾き$m$の値を確認する．",["Size=1"]);
+Letter([5.5,2],"e","(2) $y'=m$となるように点を動かす．",["Size=1"]);
+Letter([5.5,1],"e","(3) 使用する点の番号は",["Size=1"]);
+Letter([5.5,-1],"e","(4) 「線を引く」ボタンを押す．",["Size=1"]);
+//Letter([6,7],"e","「Reset」ボタンを押して，",["Size=1"]);
+//Letter([6.5,6.3],"e","やり直す．",["Size=1"]);
+
+str1="2,4,6,8,10";
+//str1=Textedit(51,str1,""); //only ketjs
+qL=Strsplit(str1,",");
+qL=apply(qL,parse("Q"+text(#)));
+if(wflg==1,Ospline("1",qL););
+
+Windispg();
+
+//Help("Textedit");

@@ -1,0 +1,43 @@
+Ketinit(1.5);
+
+Setketcindyjs(["Label=[]","Color=offwhite"]);
+
+Setwindow([-5,5],[-5,5]);
+Htickmark([-1,"-1",1,"s1e","1"]);
+
+Slider("N",[0,-6],[XMAX,-6]);
+inspect(N,"ptsize",6);
+nn=ceil(N.x*5);
+Expr(N.xy,"n4","n="+text(nn),["Size=1.5","Color=blue"]);
+
+if(flg1==1,
+  Plotdata("1","1/(1-x)","x",["Exc=[1]","Dis=1.5","Num=150"]);
+  Listplot("da1",[[1,YMIN],[1,YMAX]],["da"]);
+  Expr([0,6],"c","P_n(x)=1+x+x^2+x^3+\cdots+x^n",["Size=1.5"]);
+
+  tmp="1";
+  forall(1..nn,
+    tmp=tmp+"+x^("+text(#)+")";
+  );
+  Plotdata("2",tmp,"x",["Num=200","Color=blue"]);
+);
+
+if(flg2==1,
+  Plotdata("1","sin(x)","x",["Num=200"]);
+  Expr([0,6],"c","P_n(x)=x-\dfrac{1}{3!}x^3+\dfrac{1}{5!}x^5+\cdots+\dfrac{(-1)^n}{(2n+1)!}x^{2n+1}+\cdots",["Size=1.5"]);
+
+  tmp="x";
+  forall(1..nn,
+    pL=1..2*#+1;
+    pp=product(pL);
+    if(mod(#,2)==1,
+      tmp=tmp+"-"+format(1/pp,16)+"*x^("+text(2*#+1)+")";
+    ,
+      tmp=tmp+"+"+format(1/pp,16)+"*x^("+text(2*#+1)+")";
+    );
+  );
+  Plotdata("2",tmp,"x",["Num=200","Color=blue"]);
+);
+
+Windispg();
+

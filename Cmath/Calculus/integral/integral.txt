@@ -1,0 +1,103 @@
+////////////// Initialization/KETlib ////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+sflag=0;
+
+////////////// Draw/Figures ////////////
+Ketinit(1.5);
+Setketcindyjs(["Nolabel=[E,F]","Color=lightgray"]);//no ketjs
+
+Setwindow([-0.5,4.5],[-0.5,4.5]);
+
+A.x=-0.5;
+inspect(A,"ptsize",7);
+inspect(B,"ptsize",7);
+inspect(C,"ptsize",7);
+D.x=4.5;
+inspect(D,"ptsize",7);
+Ospline("1",[A,B,C,D],["Num=100"]);
+Expr([2,YMAX],"c","y=f(x)",["Size=1.5"]);
+Letter([5,4.5],"e","(1) 4点A,B,C,Dを動かして",["Size=1.5"]);
+Letter([5.5,4],"e","関数$y=f(x)$のグラフを設定する．",["Size=1.5"]);
+
+Slider("E",[XMIN,0],[XMAX,0]);
+Slider("F",[XMIN,0],[XMAX,0]);
+inspect(E,"ptsize",7);
+inspect(F,"ptsize",7);
+
+Htickmark([1,"1",2,"2",3,"3",4,"4",E.x,"s3","a",F.x,"s3","b"]);
+
+
+Letter([5,3.5],"e","(2) 積分区間$[a,b]$を設定する．",["Size=1.5"]);
+Expr([5.5,3],"e","a="+text(E.x),["Size=1.5"]);
+Expr([7.5,3],"e","b="+text(F.x),["Size=1.5"]);
+
+Letter([5,2.5],"e","(3) $n$等分した区間の",["Size=1.5"]);
+Letter([5.5,2],"e","最小値合計$S_{\mathrm{lower}}$，最大値合計$S_{\mathrm{upper}}$",["Size=1.5"]);
+Letter([5.5,1.5],"e","および定積分の値$S$を計算する．",["Size=1.5"]);
+Expr([6,1],"c","S_{\mathrm{lower}}",["Size=1.5","Color=red"]);
+Expr([7,1],"c","\leq",["Size=1.5"]);
+Expr([8,1],"c","S",["Size=1.5"]);
+Expr([9,1],"c","\leq",["Size=1.5"]);
+Expr([10,1],"c","S_{\mathrm{upper}}",["Size=1.5","Color=blue"]);
+
+tmp=Integrate("bzo1",[E.x,F.x]);
+Expr([8,0.5],"c",text(tmp),["Size=1.5"]);
+
+ss=Animationparam(2,1,[1,150]);
+if(ss==150,Letter([5.5,0],"e","アニメーション終了",["Size=1.5"]););
+N=round(ss);//N=10;
+xL=0..N;
+xL=apply(xL,E.x+#/N*(F.x-E.x));
+PL=[];
+S=0;
+forall(1..length(xL),
+ regional(tmp,tmp1,tmp2);
+ tmp=xL_#;
+ Listplot(text(#),[[tmp,0],[tmp,YMAX]],["nodisp","Msg=n"]);
+ tmp1=Intersectcrvs("bzo1","sg"+text(#));
+ tmp1=tmp1_1;
+ PL=append(PL,tmp1);
+);
+
+ymaxL=[];
+yminL=[];
+forall(1..length(PL)-1,
+ regional(tmp,tmp1,tmp2,tmp3);
+ tmp1=PL_#;
+ tmp2=PL_(#+1);
+ tmp=Partcrv(text(#),tmp1,tmp2,"bzo1",["nodisp","Msg=n"]);
+ yL=[];
+ forall(1..length(tmp),k,
+  tmp3=tmp_k;
+  tmp3=tmp3_2;
+  yL=append(yL,tmp3);
+ );
+ ymax=max(yL);
+ ymaxL=append(ymaxL,ymax);
+ ymin=min(yL);
+ yminL=append(yminL,ymin);
+);
+
+Smax=0;
+Smin=0;
+forall(1..length(xL)-1,
+ regional(tmp,tmp1,tmp2,tmp3,tmp4,tmp5,tmp6);
+ tmp1=xL_#;
+ tmp2=xL_(#+1);
+ tmp3=ymaxL_#;
+ tmp4=yminL_#;
+ Framedata2("bx1"+text(#),[[tmp1,0],[tmp2,tmp3]],["Color=blue","Msg=n"]);
+ tmp5=(tmp2-tmp1)*tmp3;
+ Smax=Smax+tmp5;
+ Framedata2("bx2"+text(#),[[tmp1,0],[tmp2,tmp4]],["Color=red","Msg=n"]);
+ tmp6=(tmp2-tmp1)*tmp4;
+ Smin=Smin+tmp6;
+);
+Expr([6,0.5],"c",text(Smin),["Size=1.5","Color=red"]);
+Expr([10,0.5],"c",text(Smax),["Size=1.5","Color=blue"]);
+
+Windispg();

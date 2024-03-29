@@ -8,6 +8,7 @@ ansflg=0;
 resetflg=0;
 
 ////////// figure //////////
+Ketinit();
 Setketcindyjs(["Label=[]","Color=offwhite"]);//no ketjs
 Seteditable(50,["","Size=18","Width=30"]);
 Seteditable(51,["","Size=18","Width=50"]);
@@ -47,8 +48,11 @@ Mf(ss):=(
   nn=floor(ss);
   if(ss>0,
     forall(1..nn,
-      Framedata(text(#),[[(#-1)/nn,0],[#/nn,f(#/nn)]],["corner"]);
-      Shade(["fr"+text(#)],["Color=yellow"]);
+      Framedata("u"+text(#),[[(#-1)/nn,0],[#/nn,f(#/nn)]],["corner","Color=blue"]);
+      Framedata("l1",[[0,0],[1/nn,f(0)]],["corner","Color=red"]);
+      if(nn>1,
+        Framedata("l"+text(#),[[(#-1)/nn,0],[#/nn,f((#-1)/nn)]],["corner","Color=red"]);
+      );
       if(nn<18,
         if(#<nn,
           Expr([#/nn,0],"s2","\dfrac{"+text(#)+"}{"+text(nn)+"}");
@@ -64,72 +68,74 @@ Mf(ss);
 Plotdata("1","f(x)","x=[XMIN,sqrt(XMAX)]");
 Expr([sqrt(YMAX),YMAX],"n1","y=x^2",["Size=1.3"]);
 
-Expr([1.2,1.2],"n1e","\displaystyle \int_0^1 x^2\,dx=\lim_{\Delta x_k\to 0}\sum_{k=1}^{n} f(x_k)\Delta x_k",["Size=1.3"]);
-Expr([1.2,1],"n1e","\displaystyle \phantom{\int_0^1 x^2\,dx}=\lim_{n\to\infty}S_n\ ,\ \ \ S_n=\sum_{k=1}^{n} f(x_k)\Delta x_k",["Size=1.3"]);
-Expr([1.2,0.8],"n1e","{\color{red}n}=",["Size=1.3"]);
-Letter([1.52,0.8],"n1e","$(\leq 4)$のとき，$S_n$を計算すると",["Size=1.3"]);
+Expr([1.2,1.2],"n1e","{\color{red}n}=",["Size=1.3"]);
+Letter([1.52,1.2],"n1e","$(\leq 4)$のとき，$S_n$を計算すると",["Size=1.3"]);
 if(length(str1)==0,
-  Expr([1.2,0.62],"n1e","\displaystyle S_n=\sum_{k=1}^{\color{red}n}f(x_k)\Delta x_k\ ,\ \ x_k=\dfrac{k}{\color{red}n}\ ,\ \ \Delta x_k=\dfrac{1}{\color{red}n}",["Size=1.3"]);
-  Expr([1.2,0.4],"n1e","\phantom{S_n}=\left(\dfrac{1}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}+\left(\dfrac{2}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}+\cdots+\left(\dfrac{\color{red}n}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}",["Size=1.3"]);
+  Expr([1.2,1.02],"n1e","\displaystyle S_n=\sum_{k=1}^{\color{red}n}f(x_k)\Delta x_k\ ,\ \ x_k=\dfrac{k}{\color{red}n}\ ,\ \ \Delta x_k=\dfrac{1}{\color{red}n}",["Size=1.3"]);
+  Expr([1.2,0.8],"n1e","\phantom{S_n}=\left(\dfrac{1}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}+\left(\dfrac{2}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}+\cdots+\left(\dfrac{\color{red}n}{\color{red}n}\right)^2\cdot\dfrac{1}{\color{red}n}",["Size=1.3"]);
 ,
   nn=parse(str1);
-  Expr([1.2,0.62],"n1e","\displaystyle S_n=\sum_{k=1}^{\color{red}"+str1+"}f(x_k)\Delta x_k\ ,\ \ x_k=\dfrac{k}{\color{red}"+str1+"}\ ,\ \ \Delta x_k=\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
-  Expr([1.2,0.4],"n1e","\phantom{S_n}=\left(\dfrac{\color{red}1}{\color{red}"+str1+"}\right)^2\cdot\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
+  Expr([1.2,1.02],"n1e","\displaystyle S_n=\sum_{k=1}^{\color{red}"+str1+"}f(x_k)\Delta x_k\ ,\ \ x_k=\dfrac{k}{\color{red}"+str1+"}\ ,\ \ \Delta x_k=\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
+  Expr([1.2,0.8],"n1e","\phantom{S_n}=\left(\dfrac{\color{red}1}{\color{red}"+str1+"}\right)^2\cdot\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
   forall(2..nn,
-    Expr([1.75+(#-2)*0.42,0.4],"n1e","+\left(\dfrac{"+text(#)+"}{\color{red}"+str1+"}\right)^2\cdot\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
+    Expr([1.75+(#-2)*0.42,0.8],"n1e","+\left(\dfrac{"+text(#)+"}{\color{red}"+str1+"}\right)^2\cdot\dfrac{1}{\color{red}"+str1+"}",["Size=1.3"]);
   );
-  Expr([1.2,0.2],"n1e","\phantom{S_n}=\dfrac{\color{red}1}{{\color{red}"+str1+"}^3}",["Size=1.3"]);
+  Expr([1.2,0.6],"n1e","\phantom{S_n}=\dfrac{\color{red}1}{{\color{red}"+str1+"}^3}",["Size=1.3"]);
   forall(2..nn,
-    Expr([1.5+(#-2)*0.15,0.2],"n1e","+\dfrac{"+text(#^2)+"}{{\color{red}"+str1+"}^3}",["Size=1.3"]);
+    Expr([1.5+(#-2)*0.15,0.6],"n1e","+\dfrac{"+text(#^2)+"}{{\color{red}"+str1+"}^3}",["Size=1.3"]);
   );
-  Expr([1.2,0],"n1e","\displaystyle \phantom{S_n}=",["Size=1.3"]);
-  Letter([1.6,0],"n1e","(四捨五入して小数第3位まで)",["Size=1.3"]);
+  Expr([1.2,0.4],"n1e","\displaystyle \phantom{S_n}=",["Size=1.3"]);
+  Letter([1.6,0.4],"n1e","(四捨五入して小数第3位まで)",["Size=1.3"]);
 );
 
 if(ansflg==1,
   if(parse(str1)==1,
     if(ans==1,
-      Letter([1.5,-0.2],"n1e","正解",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","正解",["Size=1.3","Color=red"]);
     ,
-      Letter([1.5,-0.2],"n1e","間違い",["Size=1.3","Color=red"]);
-      Letter([1.85,-0.2],"n1e","正解は $1$",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","間違い",["Size=1.3","Color=red"]);
+      Letter([1.85,0.2],"n1e","正解は $1$",["Size=1.3","Color=red"]);
     );
   ); 
   if(parse(str1)==2,
     if(ans==0.625,
-      Letter([1.5,-0.2],"n1e","正解",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","正解",["Size=1.3","Color=red"]);
     ,
-      Letter([1.5,-0.2],"n1e","間違い",["Size=1.3","Color=red"]);
-      Letter([1.85,-0.2],"n1e","正解は $0.625$",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","間違い",["Size=1.3","Color=red"]);
+      Letter([1.85,0.2],"n1e","正解は $0.625$",["Size=1.3","Color=red"]);
     );
   );
   if(parse(str1)==3,
     if(ans==0.519,
-      Letter([1.5,-0.2],"n1e","正解",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","正解",["Size=1.3","Color=red"]);
     ,
-      Letter([1.5,-0.2],"n1e","間違い",["Size=1.3","Color=red"]);
-      Letter([1.85,-0.2],"n1e","正解は $0.519$",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","間違い",["Size=1.3","Color=red"]);
+      Letter([1.85,0.2],"n1e","正解は $0.519$",["Size=1.3","Color=red"]);
     );
   );
   if(parse(str1)==4,
     if(ans==0.469,
-      Letter([1.5,-0.2],"n1e","正解",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","正解",["Size=1.3","Color=red"]);
     ,
-      Letter([1.5,-0.2],"n1e","間違い",["Size=1.3","Color=red"]);
-      Letter([1.85,-0.2],"n1e","正解は $0.469$",["Size=1.3","Color=red"]);
+      Letter([1.5,0.2],"n1e","間違い",["Size=1.3","Color=red"]);
+      Letter([1.85,0.2],"n1e","正解は $0.469$",["Size=1.3","Color=red"]);
     );
   );
 );
 
-Letter([1.2,-0.4],"n1e","Playボタンを押して，一般に$S_n$を計算すると",["Size=1.3"]);
+Letter([1.2,0],"n1e","Playボタンを押して，一般に$S_n$を計算すると",["Size=1.3"]);
 if((Animeflg==1)%(Animeflg==0),
-  Expr([1.2,-0.6],"n1e","\displaystyle S_n=\dfrac{1}{n^3}\sum_{k=1}^n k^2=\dfrac{(n+1)(2n+1)}{6n^2}=\dfrac{1}{6}\left(1+\dfrac{1}{n}\right)\left(2+\dfrac{1}{n}\right)",["Size=1.3"]);
+  Expr([1.2,-0.2],"n1e","\displaystyle \overline{S}_n=\dfrac{1}{n^3}\sum_{k=1}^n k^2=\dfrac{(n+1)(2n+1)}{6n^2}=\dfrac{1}{6}\left(1+\dfrac{1}{n}\right)\left(2+\dfrac{1}{n}\right)",["Size=1.3"]);
   ns=floor(ss);
-  Expr([1.2,-0.8],"n1e","\displaystyle \phantom{S_n}="+format((ns+1)*(2*ns+1)/(6*ns^2),4),["Size=1.3"]);
-  Expr([1.8,-0.8],"n1e","(n="+text(ns)+")",["Size=1.3"]);
+  Expr([1.2,-0.4],"n1e","\displaystyle \phantom{\overline{S}_n}="+format((ns+1)*(2*ns+1)/(6*ns^2),4),["Size=1.3"]);
+  Expr([1.8,-0.4],"n1e","(n="+text(ns)+")",["Size=1.3"]);
   if(ss==200,
-    Expr([1.2,-1],"n1e","\displaystyle \int_0^1 x^2\,dx=\lim_{n\to\infty}S_n=\dfrac{1}{6}\cdot1\cdot2=\dfrac{1}{3}=0.3333\cdots",["Size=1.3"]);
+    Expr([1.2,-0.6],"n1e","\displaystyle \int_0^1 x^2\,dx=\lim_{n\to\infty}S_n=\dfrac{1}{6}\cdot1\cdot2=\dfrac{1}{3}=0.3333\cdots",["Size=1.3"]);
   );
+  Expr([1.2,-0.8],"n1e","\displaystyle \underline{S}_n=\dfrac{1}{n^3}\sum_{k=1}^{n-1} k^2=\dfrac{(n-1)(2n-1)}{6n^2}=\dfrac{1}{6}\left(1-\dfrac{1}{n}\right)\left(2-\dfrac{1}{n}\right)",["Size=1.3"]);
+  ns=floor(ss);
+  Expr([1.2,-1],"n1e","\displaystyle \phantom{\underline{S}_n}="+format((ns-1)*(2*ns-1)/(6*ns^2),4),["Size=1.3"]);
+  Expr([1.8,-1],"n1e","(n="+text(ns)+")",["Size=1.3"]);
 );
 
 Listplot("do1",[[1,0],[1,f(1)],[0,f(1)]],["do"]);
@@ -137,3 +143,5 @@ Htickmark([1,"1"]);
 Vtickmark([f(1),text(f(1))]);
 
 Windispg();
+
+//Help("Subsedit");

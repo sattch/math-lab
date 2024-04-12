@@ -37,6 +37,31 @@
 
 <script id="csinit" type="text/x-cindyscript">
 Invert(x):=reverse(x);
+Removespace(str):=(
+  regional(tmp,flg,out);
+  tmp=length(str)+1;
+  flg=0;
+  forall(1..(length(str)),
+    if(flg==0,
+      if((str_#)!=" ",
+        tmp=#;
+        flg=1;
+      );
+    );
+  );
+  out=substring(str,tmp-1,length(str));
+  flg=0;
+  tmp=0;
+  forall(reverse(1..(length(out))),
+    if(flg==0,
+      if((out_#)!=" ",
+        tmp=#;
+        flg=1;
+      );
+    );
+  );
+  out=substring(out,0,tmp);
+);
 Getlevel(str):=Getlevel(str,",");
 Getlevel(str,Arg):=Getlevel(str,Arg,"()");
 Getlevel(str,Arg,bra):=(
@@ -133,9 +158,9 @@ Toupper(str):=(
   );
   out;
 );
-Totexform(str):=( //210803from[renew]
-  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,post,ctr,clv,nn,
-      tmp,tmp1,tmp2,tmp3,tmp4);
+Totexform(str):=( //231215
+  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,
+    post,ctr,clv,nn,tmp,tmp1,tmp2,tmp3,tmp4);
   tmp1="\displaystyle\int"; //210831from
   tmp2="\displaystyle\lim";
   tmp3="\displaystyle\sum"; //210831to
@@ -144,7 +169,7 @@ Totexform(str):=( //210803from[renew]
     ["_(",["_{xx}"]], //210831
     ["tx(",["\text{xx}"]], //210907
     ["tfr(",["","\frac{xx}{yy}"]], //210831,220523
-    ["fr(",["","\dfrac{xx}{yy}"]], //210228from
+    ["fr(",["","\displaystyle\frac{xx}{yy}"]], //210228from 231224
     ["log(",["\log xx ","\log_{xx} yy"]], //210405
     ["ln(",["\ln xx "]], //210903
     ["sq(",["\sqrt{xx}","\sqrt[xx]{yy}"]],
@@ -153,7 +178,7 @@ Totexform(str):=( //210803from[renew]
     ["cos(",["\cos xx ","\cos^{xx}\! yy "]], //210405
     ["tan(",["\tan xx ","\tan^{xx}\! yy "]],  //210228to  //210405
     ["lim(", ["",tmp2+"_{xx \to yy} ",tmp2+"_{xx \to yy} zz"]], //210831from
-    ["int(", [tmp1+" ",tmp1+" xx dyy ",tmp1+" yy dzz ",tmp1+"_{xx}^{yy} zz dww "]],  //211027
+    ["int(", [tmp1+" ",tmp1+" xx yy ",tmp1+" yy zz ",tmp1+"_{xx}^{yy} zz ww "]],  //211027
     ["sum(", ["",tmp3+"_{xx}^{yy} ", tmp3+"_{xx}^{yy} zz"]], //210831to
     ["diff(", ["d ","\frac{dxx}{dyy}"]], //210913
     ["par(", ["\partial ","\frac{\partial xx}{\partial yy}"]] ,//210913
@@ -161,6 +186,27 @@ Totexform(str):=( //210803from[renew]
   ];
   parL=["log(","sin(","cos(","tan(","lim(","int(","sum("]; //210901
   out=replace(str,"pi","{\pi}"); //210805
+  out=replace(out,"frac(","fr(");//231227
+  out=replace(out,"sqrt(","sq(");//231215 from
+  tmp=indexof(out,")/(");
+  ctr=1;
+  while((tmp>0)&(ctr<20),
+    tmp1=substring(out,0,tmp);
+    tmp2=substring(out,tmp+1,length(out));
+    tmp=Bracket(tmp1);
+    tmp3=tmp_(-1)_2;
+    tmp=select(tmp,#_2==-tmp3);
+    tmp=tmp_(-1)_1;
+    tmp1=substring(tmp1,0,tmp-1)+"fr("+
+           substring(tmp1,tmp,length(tmp1)-1)+",";
+    tmp=Bracket(tmp2);
+    tmp=select(tmp,#_2==-1);
+    tmp=tmp_1_1;
+    tmp2=substring(tmp2,1,length(tmp2));
+    out=tmp1+tmp2;
+    tmp=indexof(out,")/(");
+    ctr=ctr+1;
+  );//231215 to
   head="";
   flg=0;
   plv=Bracket(out,"()");
@@ -205,6 +251,11 @@ Totexform(str):=( //210803from[renew]
        if(nn==2,
           tmp1=substring(out,plv_1_1,clv_1_1-1);
           tmp2=substring(out,clv_1_1,length(out)-1);
+		  if(indexof(out,"int(")>0, //231227from
+		    if((length(tmp2)>0)&(substring(tmp2,0,1)!="d"),
+			  tmp2="d"+tmp2;
+            );
+          ); //231227to
           if(contains(parL,fun), //210901from
             tmp2=Addpar(tmp2); //211029
           ); //210901to
@@ -230,6 +281,11 @@ Totexform(str):=( //210803from[renew]
             tmp3=Addpar(tmp3); //211029
           ); //210901to
           tmp4=substring(out,clv_3_1,length(out)-1);
+		  if(indexof(out,"int(")>0, //231227from
+		    if((length(tmp4)>0)&(substring(tmp4,0,1)!="d"),
+			  tmp4="d"+tmp4;
+            );
+          );//231227to
           tmp=replace(rep_2_4,"xx",tmp1);
           tmp=replace(tmp,"yy",tmp2);
           tmp=replace(tmp,"zz",tmp3);
@@ -2209,50 +2265,6 @@ Strictmove(pCorg,sep):=(
 Addax(param):=(
   ADDAXES=text(param);
 );
-Textedit(no):=(
-  regional(tmp,tmp1,tmp2);
-  tmp="Text"+text(no)+".currenttext";
-  tmp1=parse(tmp);
-  tmp1;
-);
-Textedit(n0,str):=Textedit(n0,str,"="); //210406from
-Textedit(n0,str,sep):=( //210208from
-  regional(tmp,tmp1,tmp2,out);
-  tmp1=str;
-tmp1=Textedit(n0); //
-  tmp2=tmp1;
-  if(length(sep)>0,
-    tmp=Strsplit(sep+tmp1,sep);
-    tmp2=tmp_(-1);
-  ); //210406to
-  if(length(tmp2)==0,out=str,out=tmp2);
-  out;
-); //210208to
-Removespace(str):=(
-  regional(tmp,flg,out);
-  tmp=length(str)+1;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      if((str_#)!=" ",
-        tmp=#;
-        flg=1;
-      );
-    );
-  );
-  out=substring(str,tmp-1,length(str));
-  flg=0;
-  tmp=0;
-  forall(reverse(1..(length(out))),
-    if(flg==0,
-      if((out_#)!=" ",
-        tmp=#;
-        flg=1;
-      );
-    );
-  );
-  out=substring(out,0,tmp);
-);
 Convtrigpow(strorg):=(
   regional(tmp,tmp1,tmp2,tmp3,ctr,str,
          trigL,trig,uptrig,str1,str2);
@@ -2286,6 +2298,35 @@ Convtrigpow(strorg):=(
   );
   str;
 );
+Textedit(no):=(
+  regional(tmp,tmp1,tmp2);
+  tmp="Text"+text(no)+".currenttext";
+  tmp1=parse(tmp);
+  tmp1;
+);
+Textedit(n0,str):=Textedit(n0,str,"="); //210406from
+Textedit(n0,str,sep):=( //210208from
+  regional(tmp,tmp1,tmp2,out);
+  tmp1=str;
+tmp1=Textedit(n0); //
+  tmp2=tmp1;
+  if(length(sep)>0,
+    tmp=Strsplit(sep+tmp1,sep);
+    tmp2=tmp_(-1);
+  ); //210406to
+  if(length(tmp2)==0,out=str,out=tmp2);
+  out;
+); //210208to
+Subsedit(no,str):=(
+ regional(tmp,tmp1);
+ if(isstring(str),
+   tmp1=str;
+ ,
+   tmp1=text(str);
+ );
+ tmp="Text"+text(no); //210211[2lines]
+ parse(tmp).currenttext=tmp1;
+);
 Drwletter(pos,str):=Drwletter(pos,str,[]);
 Drwletter(pos,str,Arg):=(
   regional(sz,clr);
@@ -2296,16 +2337,6 @@ Drwletter(pos,str,sz,clr):=(
   regional(tmp);
   if(!isstring(str),tmp=text(str),tmp=str);
   drawtext(pos,tmp,size->sz,color->clr);
-);
-Subsedit(no,str):=(
- regional(tmp,tmp1);
- if(isstring(str),
-   tmp1=str;
- ,
-   tmp1=text(str);
- );
- tmp="Text"+text(no); //210211[2lines]
- parse(tmp).currenttext=tmp1;
 );
 Windispg():=(
   if(ADDAXES=="1", //181215from
@@ -3578,6 +3609,18 @@ Gettexform(str):=(
   strt;
 );
 
+GettexformL(strorg):=(
+  regional(strL,str,tmp,out);
+  strL=Strsplit(strorg,"//");
+  out=[];
+  forall(strL,str,
+    tmp=Convtrigpow(str);
+	tmp=Gettexform(tmp);
+	out=append(out,tmp);
+  );
+  out;
+);
+
 Dispposition(pos,npos,str):=Dispposition(pos,3,npos,str);
 Dispposition(pos,len,npos,str):=(
   regional(ascii,tmp,tmp1,tmp2,dp,p1,p2,p3,p4,n,ctr);
@@ -3774,7 +3817,7 @@ Errorcheckstr(str):=(
     if(indexof(str,"(")>0,
       tmp2=Bracket(str);
       tmp=tmp2_(-1);
-      if(tmp_2!=-1, // brackets mismach
+      if(tmp_2!=-1, // brackets mismatch
         tmp2=select(tmp2,abs(#_2)==1);
         tmp2=apply(tmp2,#_1);
         flg=[1,tmp2]; 
@@ -3978,24 +4021,30 @@ Clearnow():=(
 
 Delete():=(
   regional(preL,pre,tmp,tmp1,tmp2,tmp3);
-  preL=["",shL_nqu,"St="];
-  pre=preL_ch;
-  tmp=indexof(Str,"?");
-  if(tmp>0,npos=tmp,npos=length(Str));
-  if(length(Str)>length(pre),
-    if(npos==length(Str),
-      Str=substring(Str,0,npos-1);
-    ,
-      tmp1=substring(Str,0,npos-2);
-      tmp2=substring(Str,npos-1,length(Str));
-      Str=tmp1+tmp2;
-    );
-    Strnq=replace(Str,"?","");
-    Strnow=Str;
-    StrL_ch=Strnq;
-    npos=npos-1;
+  if(ch==2,
+    if(length(StrLL)>1,
+	  Str=StrLL_(-1);
+	  StrLL=StrLL_(1..(length(StrLL)-1));
+	);
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
   ,
+    preL=["",shL_nqu,"St="];
+    pre=preL_ch;
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
+    if(length(Str)>length(pre),
+      if(npos==length(Str),
+        Str=substring(Str,0,npos-1);
+      ,
+        tmp1=substring(Str,0,npos-2);
+        tmp2=substring(Str,npos-1,length(Str));
+        Str=tmp1+tmp2;
+      );
+    );
   );
+  Strnow=Str;
+  StrL_ch=Str;
   funflg=0;
 );
 
@@ -4004,10 +4053,11 @@ Allclear():=(
   preL=["",shL_nqu,"St="];
   pre=preL_ch;
   Str=pre;
-  Strnq=Str;
+  Strp="";
   StrL_ch=Str;
-  StrpL_ch="";
-  npos=length(Str);
+  StrpL_ch=Strp;
+  npos=indexof(Str,"?");
+  if(npos==0,npos=length(Str));
   funflg=0;
 );
 
@@ -4023,38 +4073,43 @@ Push():=(
   regional(tmp,tmp1);
   tmp1=StrL_ch;
   tmp=indexof(tmp1,"//");
-  if(tmp==0,
-    StrpL_ch=StrpL_ch+tmp1+"//";
-    Str="";
-    npos=0;
-  ,
+  if(tmp>0,
     StrpL_ch=StrpL_ch+substring(tmp1,0,tmp+1);
+	Strp=StrpL_ch;
     Str=substring(tmp1,tmp+1,length(tmp1));
     npos=max([0,npos-(tmp+1)]);
+    StrL_ch=Str;
+	Subsedit(ch,Str);
   );
-  StrL_ch=Str;
-  Strnq=Str;
   funflg=0;
 );
 
 Pull():=(
   regional(tmp,tmp1,tmp2);
-  tmp1=StrpL_ch;
-  tmp=indexall(tmp1,"//");
-  if(length(tmp)>1,tmp=tmp_(-2)+1,tmp=0);
-  tmp2=substring(tmp1,0,tmp);
-  StrpL_ch=tmp2;
-  tmp1=substring(tmp1,tmp,length(tmp1));
-  Str=tmp1+StrL_ch;
-  Strnq=Str;
-  StrL_ch=Str;
-  npos=length(tmp1)+npos;
+  if(length(Strp)>0,
+    tmp=Indexall(Strp,"//");
+    if(length(tmp)>1,
+	  tmp1=tmp_(-2)+1;
+	,
+      tmp1=0;
+    );
+	tmp=substring(Strp,tmp1,length(Strp));
+	Strp=substring(Strp,0,tmp1);
+	StrpL_ch=Strp;
+    Str=tmp+Str;
+	StrL_ch=Str;
+	npos=indexof(Str,"?");
+	if(npos==0,npos=length(Str));
+	Subsedit(ch,Str);
+	TexL_ch=GettexformL(Str);
+  );
   funflg=0;
 );
 
 Left():=(
   regional(preL,pre,tmp,tmp1,tmp2,tmp3);
-  preL=["",shL_nqu,"St="];
+  tmp=substring(shL_nqu,0,shminL_nqu);
+  preL=["",tmp,"St="];
   pre=preL_ch;
   if(length(Str)>length(pre),
     tmp=indexof(Str,"?");
@@ -4071,8 +4126,7 @@ Left():=(
       Str=tmp1+tmp3;  
       npos=length(tmp1);
     );
-    Strnq=replace(Str,"?","");
-    StrL_ch=Strnq;
+    StrL_ch=Str;
   );
   funflg=0;
 );
@@ -4096,23 +4150,24 @@ Right():=(
         npos=length(Str);
       );
     );
-    Strnq=replace(Str,"?","");
-    StrL_ch=Strnq;
+    StrL_ch=Str;
+	Subsedit(ch,Str);
   );
   funflg=0;
 );
 
 LLeft():=(
   regional(preL,pre,tmp,tmp1,tmp2,tmp3);
-  preL=["",shL_nqu,"St="];
+  tmp=substring(shL_nqu,0,shminL_nqu);
+  preL=["",tmp,"St="];
   pre=preL_ch;
   tmp=replace(Str,"?","");
   if(length(tmp)>length(pre),
     tmp=substring(tmp,length(pre),length(tmp));
     Str=pre+"?"+tmp;
     npos=length(pre)+1;
-    Strnq=replace(Str,"?","");
-    StrL_ch=Strnq;
+    StrL_ch=Str;
+	Subsedit(ch,Str);
   );
   funflg=0;
 );
@@ -4122,8 +4177,8 @@ RRight():=(
   if(length(Str)>0,
     Str=replace(Str,"?","");
     npos=length(Str);
-    Strnq=replace(Str,"?","");
-    StrL_ch=Strnq;
+    StrL_ch=Str;
+	Subsedit(ch,Str);
   );
   funflg=0;
 );
@@ -4136,7 +4191,7 @@ Quesno(nq,flg):=( //220816
   if(length(tmp)>0,
     tmp1=tmp_(-1);
     out=quL_tmp1;
-    if(islist(out),out=out_1); /////
+    if(islist(out),out=out_1);
     tmp=indexof(out," ");
     if(tmp>0,
       out=substring(out,0,tmp-1);
@@ -4197,6 +4252,8 @@ shline="Q01---	[1]y'=	[2]y'=";
 sqline="01AA	2	2	2CR02BB	2	2	2";
 );
 
+
+
 dtpy0=3.2;
 size=[22,22];
 dtpyL=dtpy0/22*size;
@@ -4205,10 +4262,26 @@ ch=2;
 
 </script>
 <script id="csdraw" type="text/x-cindyscript">
-Ketinit(1.6);
+Ketinit(1);
+
 
 if(startflg==1,
   Kettaskinit();
+  shminL=[];
+  forall(1..(length(shL)),
+    tmp=indexof(shL_#,"?");
+    if(tmp>0,
+	  tmp1=tmp-1;tmp2=tmp;
+    ,
+	  tmp1=length(shL_#);tmp2=tmp1;
+    );
+    shminL=append(shminL,tmp1);
+  );
+  Str="";
+  Strp="";
+  StrL=apply(1..3,"");
+  TexL=apply(1..2,"");
+  StrLL=[];
   Putpoint("Q2",[33.5,20.5]);
   Subsedit(3,"St=");
   Subsedit(1,"");
@@ -4219,6 +4292,13 @@ if(startflg==1,
 
   startflg=0;
 );
+
+tpL=apply([T1.xy,T3.xy],#+[1.2,-0.5]);
+T2.x=T1.x;
+T4.x=T3.x;
+dyL=[T1.y-T2.y,T3.y-T4.y];
+if(T1.y-T2.y<dtpyL_1,T2.y=T1.y-dtpyL_1);
+if(T3.y-T4.y<dtpyL_2,T4.y=T3.y-dtpyL_2);
 
 if(stok<=1,
   Subsedit(1,"");
@@ -4232,9 +4312,6 @@ if(stok<=1,
   );
 );
 
-T2.x=T1.x; T4.x=T3.x;
-if(T1.y-T2.y<dtpyL_1,T2.y=T1.y-dtpyL_1);
-if(T3.y-T4.y<dtpyL_2,T4.y=T3.y-dtpyL_2);
 
 Addax(0);
 nameL=Keyname();
@@ -4256,11 +4333,20 @@ Keytable(1,43,1,33,tmp,0,CtrkeyL_4,[0,-0.5],21);
 
 if(stok<=1,
   tmp="St=";
-  Str=Textedit(3,"","");
-  if(indexof(Str,tmp)==0,Str=tmp+Str);
-  Strnq=replace(Str,"?","");
-  StrL_3=Strnq;
-  npos=length(Str);
+  if(funflg==1,
+	  Str=Textedit(3,"St=","");
+    if(contains(Manifun,name),
+      parse(name+";");
+      name="";
+    ,
+      Out=Addfunstr(name,length(Str),Str);
+	    Str=Out_1;
+      StrL_3=Str;
+      npos=length(Str);
+    );
+    Subsedit(ch,Str);
+    funflg=0;
+  );
   if((stok==1)&(stoknow!=stok), //230417
     tmp=replace(StrL_3,"St=","");
     if(length(tmp)>0,
@@ -4269,8 +4355,8 @@ if(stok<=1,
         tmp1=sqLL_stno;
         stname=tmp1_1;
         Str="St="+stno+" "+stname;
-        Strnq=replace(Str,"?","");
-        StrL_3=Strnq;
+        StrL_3=Str;
+	      Subsedit(3,Str);
         npos=length(Str);
       );
     );
@@ -4288,20 +4374,20 @@ if(stok>=2,
       sel=apply(sel,if(isstring(#),parse(#),#));
       quest=apply(1..(length(sel)),
               quL_#_1+" "+quL_#_(sel_#));
+	  TexL_1=GettexformL(quest_1);
       rechead=text(stno)+";;"+text(stno);
       Str=ansL_1;
-      Strnq=Str;
-      StrL_ch=Str;
-      npos=length(Str);
+	  StrL_2=Str;
+	  Subsedit(2,Str);
+      StrLL=append(StrLL,Str);
+      tmp=indexof(Str,"?");
+      if(tmp>0,npos=tmp,npos=length(Str));
+	  tmp=replace(Str,"?","");
+	  TexL_2=GettexformL(tmp);
+      ch=2;
       nqu=1;
     );
-    ch=2;
     stoknow=2;
-  );
-  if(stoknow==2,
-    Str=Textedit(2,"","");
-    Strnq=replace(Str,"?","");
-    StrL_2=Strnq;
   );
 );
 
@@ -4313,27 +4399,34 @@ if(ch<=2,
 
 if(stoknow==2,
   if(abs(nqinc)>0,
-    ansL_nqu=Strnq;
+    ansL_nqu=Str;
     if(nqinc>0,nqu=min([nqu+nqinc,quall]));
     if(nqinc<0,nqu=max([nqu+nqinc,1]));
+    StrL_1=quest_nqu;
+    TexL_1=GettexformL(StrL_1);
     Str=ansL_nqu;
-    Strnq=Str;
     StrL_2=Str;
-    npos=length(Str);
-    Subsedit(2,Strnq);//220629readded
+    TexL_2=GettexformL(Str);
+    Subsedit(2,Str);
+    tmp=Convtrigpow(Str);
+    TexL_2=Gettexform(tmp);
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
+    Subsedit(2,Str);
     nqinc=0;
   );
   tmp=Quesno();
   if(length(tmp)>0,
-    drawtext(Text1.xy-[7,0],tmp,size->18);
-    StrL_1=quest_nqu;
+    drawtext(Text1.xy-[7,0],tmp,size->22);
     tmp=select(1..nqu,//230411from
           substring(quest_#,0,1)=="Q");
     if(length(tmp)>0,
       tmp1=tmp_(-1);
-      tmp=Gettexform(quest_tmp1);
-      drawtext(Q2.xy+[0.4,-0.2],tmp,size->16);
-    );//230411to
+      StrL_1=quest_nqu;
+      Subsedit(1,StrL_1);
+      tmp=GettexformL(quest_tmp1);
+      drawtext(Q2.xy+[0.4,-0.2],tmp_1,size->16);
+    );
   );
 );
 
@@ -4342,165 +4435,89 @@ if((recflg==1)&(stoknow==2),
   ansL_nqu=Textedit(ch,"","");
   str="";
   forall(1..(length(ansL)),n,
-    str=str+ansL_n+";;";
+    tmp=replace(ansL_n,"?","");
+    str=str+tmp+";;";
   );
   rec=rec+substring(str,0,length(str)-2);
   Subsedit(9,rec);
   StrL_4=rec;
   recflg=0;
 );
+
 if(funflg==1,
   if(contains(Manifun,name),
     parse(name+";");
+    StrL_ch=Str;
     Subsedit(ch,Str);
+    tmp=replace(Str,"?","");
+    tmp=Convtrigpow(tmp);
+    TexL_2=Gettexform(tmp);	
     name="";
   ,
     if(indexof(StrL_ch,"---")==0,
-      tmp=indexof(Str,"?");
-      if(tmp>0,npos=tmp,npos=length(Str));
-      out=Addfunstr(name,npos,Str);
-      tmp=length(out_1)-length(Str);
-      npos=npos+tmp;
-      Str=out_1; //npos=out_2;
-      if(npos<length(Str),
-        tmp=replace(Str,"?","");
-        tmp1=substring(tmp,0,npos-1)+"?";
-        Str=tmp1+substring(tmp,npos-1,length(tmp));
+      Str=StrL_ch;
+      npos=indexof(Str,"?");
+      if(npos==0,
+        npos=length(Str);
+        tmp1=Str;
+        tmp2="";
+      ,
+	      tmp1=substring(Str,0,npos-1);
+	      tmp2=substring(Str,npos,length(Str));
       );
-      Strnq=replace(Str,"?","");
+      out=Addfunstr(name,npos,tmp1);
+      tmp1=out_1;
+      npos=indexof(tmp1,"?");
+      if(npos>0,
+        Str=tmp1+tmp2;
+      ,
+        if(length(tmp2)>0,
+          Str=tmp1+"?"+tmp2;
+          npos=indexof(Str,"?");
+        ,
+          Str=tmp1+tmp2;
+          npos=length(tmp1);
+        );
+      );
+      StrLL=append(StrLL,StrL_2);
       StrL_ch=Str;
+      tmp=replace(Str,"?","");
+      tmp=Convtrigpow(tmp);
+      TexL_ch=Gettexform(tmp);
       Subsedit(ch,Str);
     );
   );
+  name="";
   funflg=0;
 );
 
 if(stoknow==2,
-  flg=0;
-  Str=Textedit(2,"","");
-  Str=replace(Str,"///","//");
-  tmp=length(Str);
-  if(substring(Str,tmp-2,tmp)=="//",
-    tmp1=indexof(Str,"sz=");
-    if(tmp1>0,
-      tmp2=substring(Str,tmp1-1,tmp);
-      Str=substring(Str,0,tmp1-1);
-      tmp2=replace(tmp2,"//","");
-      tmp2=replace(tmp2,"sz=","");
-      if(tmp2=="+",tmp2=tmp2+"1");
-      if(tmp2=="-",tmp2=tmp2+"1");
-      tmp2=parse(Removespace(tmp2));
-      size_ch=size_ch+tmp2;
-      dtpyL_ch=dtpy0*size_ch/22;
-    );
-    if(indexof(shL_nqu,"---")==0,
-      if(length(tmp)>length(shL_nqu),
-        Strnq=replace(Str,"?","");
-        tmp1=StrL_ch;
-        StrL_ch=Strnq;
-        Subsedit(ch,Str);
-        npos=npos+length(Str)-length(tmp1);
-        flg=1;
-      );
-    );
-  );
-  tmp1=shL_nqu;
-  if(substring(Str,0,length(tmp1))!=tmp1,
-    Str=tmp1;
-    Strnq=replace(Str,"?","");
-    StrL_ch=Strnq;
-    flg=1;
-  );
-  if(flg==0,
-    tmp=shL_nqu;
-    npos=length(tmp);
-  );
-  tpL=[T1.xy,T3.xy];
-  dyL=[T1.y-T2.y,T3.y-T4.y];
-  texstr="";
-  forall(1..nch,nc,
-    sL=[];
-    tmp=StrL_nc;
-    if(length(tmp)>0,
-      tmp1=tokenize(tmp,"//");
-      tmp1=apply(tmp1,if(isstring(#),#,text(#)));
-      sL=concat(sL,tmp1);
-    );
-    tp=tpL_nc;
-    dy=dyL_nc;
-    ns=length(sL);
-    forall(1..ns,nn,
-      flg=0; //220609from
-      tmp1=sL_nn;
-      if(flg==0, // 220718from
-        tmp3=Indexall(tmp1,"^");
-        tmp2=[];
-        forall(tmp3,
-          if(#==1,
-            tmp2=append(tmp2,#);
-          ,
-            if(tmp1_(#-1)=="(",
-              tmp2=append(tmp2,#);
-            ,
-              if(#>=4,
-                tmp=substring(tmp1,#-4,#-1);
-                if(contains(["sin","cos","tan"],tmp),
-                  tmp2=append(tmp2,#);
-                );
-              );    
-            );
-          );
-        );
-        if(length(tmp2)>0,
-          flg=1;
-          tmp=tp+[0,-0.2];
-          forall(1..(length(tmp1)),mm,
-            tmp3=tmp1_mm;
-            clr=[0,0,0];
-            if(contains(tmp2,mm),clr=[1,0,0]);
-            tmp_1=tmp_1+1.25;
-            Drwletter(tmp,tmp3,size_nc,clr);
-          );
-        );
-      ); // 220718to
-      if((flg==0)&(indexof(tmp1,"("))>0,
-        tmp2=Bracket(tmp1);
-        tmp=tmp2_(-1);
-        if(tmp_2!=-1,
-          flg=1;
-          tmp2=select(tmp2,abs(#_2)==1);
-          tmp2=apply(tmp2,#_1);
-          tmp=tp+[0,-0.2];
-          forall(1..(length(tmp1)),mm,
-            tmp3=tmp1_mm;
-            clr=[0,0,0];
-            if(contains(tmp2,mm),clr=[1,0,0]);
-            tmp_1=tmp_1+1.25;
-            Drwletter(tmp,tmp3,size_nc,clr);
-          );
-        );
-      );
-      if(flg==0,
-        tmp1=Convtrigpow(sL_nn);
-        strt=Gettexform(tmp1);
-        tmp=tp+[1.2,-0.2];
-        Drwletter(tmp,strt,size_nc);
-      );
-      tp=tp-[0,dy];
-      texstr=texstr+strt;
-    ); //220609to
+  tmp=Textedit(2,"","");
+  Str=StrL_2;
+  if(tmp!=Str,
+    StrLL=append(StrLL,Str);
+	Str=tmp;
+    StrL_2=Str;
   );
   Subsedit(2,Str);
-  drawtext(pgpos,"Pg="+text(nqu),size->16);
+  npos=indexof(Str,"?");
+  if(npos==0,
+    npos=length(Str);
+  );
+  tmp=replace(Strp+Str,"?","");
+  TexL_2=GettexformL(tmp);
 );
 
 if(stoknow==2,
-  Subsedit(2,Str); 
-  Subsedit(1,StrL_1);
-);
-
-if(stok==1,
-  Subsedit(3,StrL_3);
+  drawtext(pgpos,"Pg="+text(nqu),size->16);
+  forall(1..(length(TexL_1)),
+    tmp=tpL_1-[0,(#-1)*dyL_1];
+    Drwletter(tmp,TexL_1_#,22);
+  );
+  forall(1..(length(TexL_2)),
+    tmp=tpL_2-[0,(#-1)*dyL_2];
+    Drwletter(tmp,TexL_2_#,22);
+  );
 );
 
 Windispg();
@@ -4525,21 +4542,22 @@ var cdy = CindyJS({
     {name: "Text2", type: "EditableText", pos: [4.0, -0.8516129032258064, 0.25806451612903225], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 580, textsize: 24.0},
     {name: "T1", type: "Free", pos: [-3.5632183908045985, -4.0, -0.2298850574712644], color: [0.0, 0.0, 0.0], labeled: false, size: 6.0, border: false},
     {name: "T2", type: "Free", pos: [4.0, 3.664516129032257, 0.25806451612903225], color: [1.0, 0.784, 0.0], labeled: false, size: 6.0, border: false},
-    {name: "T3", type: "Free", pos: [4.0, 2.838709677419355, 0.25806451612903225], color: [0.0, 0.0, 0.0], labeled: false, size: 6.0, border: false},
-    {name: "T4", type: "Free", pos: [4.0, 2.0129032258064514, 0.25806451612903225], color: [1.0, 0.784, 0.0], labeled: false, size: 6.0, border: false},
+    {name: "T3", type: "Free", pos: [4.0, 2.8387096774193545, 0.25806451612903225], color: [0.0, 0.0, 0.0], labeled: false, size: 6.0, border: false},
+    {name: "T4", type: "Free", pos: [4.0, 2.012903225806451, 0.25806451612903225], color: [1.0, 0.784, 0.0], labeled: false, size: 6.0, border: false},
     {name: "SW", type: "Free", pos: [1.4694412402425423, -4.0, 0.12563238528778808], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "Text3", type: "EditableText", pos: [4.0, -0.8621236133122027, 0.06339144215530904], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 200, text: "St=", textsize: 21.0},
+    {name: "Text3", type: "EditableText", pos: [4.0, -0.8621236133122027, 0.06339144215530904], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 115, text: "St=", textsize: 21.0},
     {name: "Text9", type: "EditableText", pos: [1.7714285714285714, -4.0, 0.11428571428571428], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 580, textsize: 24.0},
     {name: "Q2", type: "Free", pos: [4.0, 2.4477611940298507, 0.11940298507462686], color: [1.0, 0.784, 0.0], size: 6.0, border: false},
+    {name: "Text10", type: "EditableText", pos: [4.0, -1.7391304347826086, 0.049689440993788817], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 350, textsize: 24.0},
     {name: "Text7", type: "Button", pos: [-2.0, -4.0, -0.17391304347826086], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 0.45, script: "ch=1;initflg=1;", text: "1", textsize: 18.0},
     {name: "Text8", type: "Button", pos: [4.0, -1.1478260869565216, 0.34782608695652173], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 0.45, script: "ch=2;initflg=1;", text: "2", textsize: 18.0},
     {name: "Text4", type: "Button", pos: [4.0, 0.0851063829787234, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "nqinc=-1;", text: "　　", textsize: 14.0},
-    {name: "Text20", type: "Button", pos: [4.0, -0.5565217391304348, 0.057971014492753624], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.0, 0.0], fillalpha: 0.27272728085517883, script: "startflg=1;", text: "Rset", textsize: 16.0},
+    {name: "Text20", type: "Button", pos: [4.0, -0.540845070422535, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.0, 0.0], fillalpha: 0.27272728085517883, script: "startflg=1;", text: "Rset", textsize: 16.0},
     {name: "Text30", type: "Button", pos: [4.0, -1.3137254901960786, 0.19607843137254902], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"La\",\"A\",\"{\\alpha}\",\"\\mathbf{a}\",\"{\\vec{a}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text31", type: "Button", pos: [4.0, -1.08502024291498, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lb\",\"B\",\"{\\beta}\",\"\\mathbf{b}\",\"{\\vec{b}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text32", type: "Button", pos: [4.0, -0.9241379310344828, 0.13793103448275862], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lc\",\"C\",\"{\\gamma}\",\"\\mathbf{c}\",\"{\\vec{c}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
-    {name: "Text33", type: "Button", pos: [4.0, -0.8048048048048049, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"sin(\";", text: "　　", textsize: 14.0},
-    {name: "Text34", type: "Button", pos: [4.0, -0.7127659574468085, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"sq(\";", text: "　　", textsize: 14.0},
+    {name: "Text33", type: "Button", pos: [4.0, -0.8048048048048049, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"sin(?)\";", text: "　　", textsize: 14.0},
+    {name: "Text34", type: "Button", pos: [4.0, -0.7127659574468085, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"sq(?)\";", text: "　　", textsize: 14.0},
     {name: "Text35", type: "Button", pos: [4.0, -0.6396181384248211, 0.0954653937947494], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\")\";", text: "　　", textsize: 14.0},
     {name: "Text36", type: "Button", pos: [4.0, -0.5800865800865801, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n7\";", text: "　　", textsize: 14.0},
     {name: "Text37", type: "Button", pos: [4.0, -0.5306930693069307, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n8\";", text: "　　", textsize: 14.0},
@@ -4548,8 +4566,8 @@ var cdy = CindyJS({
     {name: "Text40", type: "Button", pos: [4.0, -1.9607843137254903, 0.19607843137254902], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lx\",\"X\",\"{\\kappa}\",\"\\mathbf{x}\",\"{\\vec{x}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text41", type: "Button", pos: [4.0, -1.619433198380567, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Ly\",\"Y\",\"{\\iota}\",\"\\mathbf{y}\",\"{\\vec{y}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text42", type: "Button", pos: [4.0, -1.3793103448275863, 0.13793103448275862], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lz\",\"Z\",\"{\\eta}\",\"\\mathbf{z}\",\"{\\vec{z}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
-    {name: "Text43", type: "Button", pos: [4.0, -1.2012012012012014, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"cos(\";", text: "　　", textsize: 14.0},
-    {name: "Text44", type: "Button", pos: [4.0, -1.0638297872340423, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"fr(\";", text: "　　", textsize: 14.0},
+    {name: "Text43", type: "Button", pos: [4.0, -1.2012012012012014, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"cos(?)\";", text: "　　", textsize: 14.0},
+    {name: "Text44", type: "Button", pos: [4.0, -1.0638297872340423, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"fr(?,)\";", text: "　　", textsize: 14.0},
     {name: "Text45", type: "Button", pos: [4.0, -0.9546539379474941, 0.0954653937947494], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\",\";", text: "　　", textsize: 14.0},
     {name: "Text46", type: "Button", pos: [4.0, -0.8658008658008658, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n4\";", text: "　　", textsize: 14.0},
     {name: "Text47", type: "Button", pos: [4.0, -0.7920792079207921, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n5\";", text: "　　", textsize: 14.0},
@@ -4558,8 +4576,8 @@ var cdy = CindyJS({
     {name: "Text50", type: "Button", pos: [4.0, -2.607843137254902, 0.19607843137254902], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lr\",\"R\",\"{\\rho}\",\"\\mathbf{r}\",\"{\\vec{r}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text51", type: "Button", pos: [4.0, -2.153846153846154, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Ls\",\"S\",\"{\\sigma}\",\"\\mathbf{s}\",\"\\vec{s}\\;\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text52", type: "Button", pos: [4.0, -1.8344827586206898, 0.13793103448275862], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lt\",\"T\",\"{\\tau}\",\"\\mathbf{t}\",\"{\\vec{t}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
-    {name: "Text53", type: "Button", pos: [4.0, -1.5975975975975978, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"tan(\";", text: "　　", textsize: 14.0},
-    {name: "Text54", type: "Button", pos: [4.0, -1.4148936170212765, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"tfr(\";", text: "　　", textsize: 14.0},
+    {name: "Text53", type: "Button", pos: [4.0, -1.5975975975975978, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"tan(?)\";", text: "　　", textsize: 14.0},
+    {name: "Text54", type: "Button", pos: [4.0, -1.4148936170212765, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"tfr(?,)\";", text: "　　", textsize: 14.0},
     {name: "Text55", type: "Button", pos: [4.0, -1.269689737470167, 0.0954653937947494], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"(\";", text: "　　", textsize: 14.0},
     {name: "Text56", type: "Button", pos: [4.0, -1.1515151515151516, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n1\";", text: "　　", textsize: 14.0},
     {name: "Text57", type: "Button", pos: [4.0, -1.0534653465346535, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n2\";", text: "　　", textsize: 14.0},
@@ -4568,9 +4586,9 @@ var cdy = CindyJS({
     {name: "Text60", type: "Button", pos: [4.0, -3.2549019607843137, 0.19607843137254902], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lw\",\"W\",\"{\\omega}\",\"\\mathbf{w}\",\"{\\vec{w}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text61", type: "Button", pos: [4.0, -2.6882591093117414, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"_(\";", text: "　　", textsize: 14.0},
     {name: "Text62", type: "Button", pos: [4.0, -2.2896551724137932, 0.13793103448275862], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"=\";", text: "　　", textsize: 14.0},
-    {name: "Text63", type: "Button", pos: [4.0, -1.9939939939939941, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"log(\";", text: "　　", textsize: 14.0},
-    {name: "Text64", type: "Button", pos: [4.0, -1.7659574468085106, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"ln(\";", text: "　　", textsize: 14.0},
-    {name: "Text65", type: "Button", pos: [4.0, -1.5847255369928404, 0.0954653937947494], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"^(\";", text: "　　", textsize: 14.0},
+    {name: "Text63", type: "Button", pos: [4.0, -1.9939939939939941, 0.12012012012012012], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"log(?)\";", text: "　　", textsize: 14.0},
+    {name: "Text64", type: "Button", pos: [4.0, -1.7659574468085106, 0.10638297872340424], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"ln(?)\";", text: "　　", textsize: 14.0},
+    {name: "Text65", type: "Button", pos: [4.0, -1.5847255369928404, 0.0954653937947494], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"^(?)\";", text: "　　", textsize: 14.0},
     {name: "Text66", type: "Button", pos: [4.0, -1.4372294372294374, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"n0\";", text: "　　", textsize: 14.0},
     {name: "Text67", type: "Button", pos: [4.0, -1.314851485148515, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\".\";", text: "　　", textsize: 14.0},
     {name: "Text68", type: "Button", pos: [4.0, -1.2116788321167886, 0.07299270072992702], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"(sp)\";", text: "　　", textsize: 14.0},
@@ -4584,7 +4602,7 @@ var cdy = CindyJS({
     {name: "Text76", type: "Button", pos: [4.0, -1.7835497835497838, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Le\",\"E\",\"{\\delta}\",\"\\mathbf{e}\",\"{\\vec{e}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text77", type: "Button", pos: [4.0, -1.631683168316832, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lf\",\"F\",\"{\\varepsilon}\",\"\\mathbf{f}\",\"{\\vec{f}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text78", type: "Button", pos: [4.0, -1.5036496350364967, 0.07299270072992702], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lg\",\"G\",\"{\\varphi}\",\"\\mathbf{g}\",\"{\\vec{g}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
-    {name: "Text79", type: "Button", pos: [4.0, -1.3942470389170898, 0.0676818950930626], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==0,name=\"lim(\");if(Shift==1,name=\"lim(\");if(Shift==2,name=\"mat(\");", text: "　　", textsize: 14.0},
+    {name: "Text79", type: "Button", pos: [4.0, -1.3942470389170898, 0.0676818950930626], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==0,name=\"lim(?)\");if(Shift==1,name=\"lim(?)\");if(Shift==2,name=\"mat(?)\");", text: "　　", textsize: 14.0},
     {name: "Text80", type: "Button", pos: [4.0, -1.2996845425867507, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"pi\";", text: "　　", textsize: 14.0},
     {name: "Text81", type: "Button", pos: [3.414225941422594, -4.0, 0.1673640167364017], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"(cross)\";", text: "　　", textsize: 14.0},
     {name: "Text82", type: "Button", pos: [4.0, -3.8704453441295548, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"!\";", text: "　　", textsize: 14.0},
@@ -4607,7 +4625,7 @@ var cdy = CindyJS({
     {name: "Text99", type: "Button", pos: [4.0, -2.154455445544554, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Ln\",\"N\",\"{\\nu}\",\"\\mathbf{n}\",\"{\\vec{n}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text100", type: "Button", pos: [4.0, -1.9854014598540148, 0.07299270072992702], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lo\",\"O\",\"{\\omega}\",\"\\mathbf{o}\",\"{\\vec{o}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text101", type: "Button", pos: [4.0, -1.840947546531303, 0.0676818950930626], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"'\";", text: "　　", textsize: 14.0},
-    {name: "Text102", type: "Button", pos: [4.0, -1.7160883280757098, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==1,name=\"diff(\");if(Shift==2,name=\"case(\");if(Shift==0,name=\"case(\");", text: "　　", textsize: 14.0},
+    {name: "Text102", type: "Button", pos: [4.0, -1.7160883280757098, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==1,name=\"diff(?,)\");if(Shift==2,name=\"case(?)\");if(Shift==0,name=\"case(?)\");", text: "　　", textsize: 14.0},
     {name: "Text103", type: "Button", pos: [2.6754098360655734, -4.0, 0.13114754098360656], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"\\\";", text: "　　", textsize: 14.0},
     {name: "Text104", type: "Button", pos: [3.239344262295082, -4.0, 0.13114754098360656], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"(pm)\";", text: "　　", textsize: 14.0},
     {name: "Text105", type: "Button", pos: [3.80327868852459, -4.0, 0.13114754098360656], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"(mp)\";", text: "　　", textsize: 14.0},
@@ -4617,8 +4635,8 @@ var cdy = CindyJS({
     {name: "Text109", type: "Button", pos: [4.0, -2.6406926406926408, 0.08658008658008658], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lq\",\"Q\",\"{\\psi}\",\"\\mathbf{q}\",\"{\\vec{q}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text110", type: "Button", pos: [4.0, -2.4158415841584158, 0.07920792079207921], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lu\",\"U\",\"{\\Phi}\",\"\\mathbf{u}\",\"{\\vec{u}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
     {name: "Text111", type: "Button", pos: [4.0, -2.226277372262774, 0.07299270072992702], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=[\"Lv\",\"V\",\"{\\lambda}\",\"\\mathbf{v}\",\"{\\vec{v}\\;}\"]_keytype;", text: "　　", textsize: 14.0},
-    {name: "Text112", type: "Button", pos: [4.0, -2.0642978003384096, 0.0676818950930626], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==1,name=\"br(\");if(Shift==2,name=\"sum(\");if(Shift==0,name=\"sum(\");", text: "　　", textsize: 14.0},
-    {name: "Text113", type: "Button", pos: [4.0, -1.9242902208201893, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==0,name=\"tx(\");if(Shift==1,name=\"par(\");if(Shift==2,name=\"(circ)\");", text: "　　", textsize: 14.0},
+    {name: "Text112", type: "Button", pos: [4.0, -2.0642978003384096, 0.0676818950930626], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==1,name=\"br(?)\");if(Shift==2,name=\"sum(?)\");if(Shift==0,name=\"sum(?)\");", text: "　　", textsize: 14.0},
+    {name: "Text113", type: "Button", pos: [4.0, -1.9242902208201893, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;if(Shift==0,name=\"tx(?)\");if(Shift==1,name=\"par(?)\");if(Shift==2,name=\"(circ)\");", text: "　　", textsize: 14.0},
     {name: "Text200", type: "Button", pos: [4.0, 0.1987577639751553, 0.2484472049689441], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"Push()\";", text: "　　", textsize: 14.0},
     {name: "Text201", type: "Button", pos: [4.0, 0.15686274509803924, 0.19607843137254902], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"Pull()\";", text: "　　", textsize: 14.0},
     {name: "Text202", type: "Button", pos: [4.0, 0.12955465587044537, 0.1619433198380567], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"Allclear()\";", text: "　　", textsize: 14.0},
@@ -4635,23 +4653,23 @@ var cdy = CindyJS({
     {name: "Text18", type: "Button", pos: [2.111475409836066, -4.0, 0.13114754098360656], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "recflg=1;", text: "　　", textsize: 14.0},
     {name: "Text16", type: "Button", pos: [4.0, -0.42271293375394325, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "if(Shift!=1,Shift=1,Shift=0);", text: "　　", textsize: 14.0},
     {name: "Text17", type: "Button", pos: [4.0, -0.6309148264984227, 0.06309148264984227], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "if(Shift!=2,Shift=2,Shift=0);", text: "　　", textsize: 14.0},
-    {name: "Text19", type: "Button", pos: [4.0, -0.9971014492753623, 0.057971014492753624], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 0.27272728085517883, script: "stok=stok+1;", text: "O  K", textsize: 16.0},
+    {name: "Text19", type: "Button", pos: [4.0, -0.9352112676056338, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [0.0, 1.0, 0.0], fillalpha: 0.27272728085517883, script: "stok=stok+1;", text: "O  K", textsize: 16.0},
     {name: "Text5", type: "Button", pos: [4.0, 0.06095238095238095, 0.0761904761904762], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "nqinc=1;", text: "　　", textsize: 14.0},
-    {name: "Text371", type: "Button", pos: [4.0, -0.8947368421052632, 0.05263157894736842], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "resetclock();playanimation();Animeflg=1;Dirflg=1;\n        sorg=Current;", text: "Play", textsize: 18.0},
-    {name: "Text372", type: "Button", pos: [4.0, -1.105263157894737, 0.05263157894736842], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "Animeflg=1-Animeflg;if(Animeflg==0,pauseanimation();\n        sorg=sstart;,resetclock();playanimation(););", text: "Pause", textsize: 18.0},
-    {name: "Text373", type: "Button", pos: [4.0, -1.3157894736842106, 0.05263157894736842], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "sorg=sstart;Dirflg=-Dirflg;Animeflg=1;resetclock();\n        playanimation();", text: "Rev", textsize: 18.0},
-    {name: "Text374", type: "Button", pos: [4.0, -1.5263157894736843, 0.05263157894736842], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "stopanimation();Animeflg=\"\";sstart=Current;", text: "Stop", textsize: 18.0}
+    {name: "Text371", type: "Button", pos: [4.0, -1.1605633802816901, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "resetclock();playanimation();Animeflg=1;Dirflg=1;\n        sorg=Current;", text: "Play", textsize: 18.0},
+    {name: "Text372", type: "Button", pos: [4.0, -1.3464788732394366, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.741, 0.467], fillalpha: 0.47, script: "Animeflg=1-Animeflg;if(Animeflg==0,pauseanimation();\n        sorg=sstart;,resetclock();playanimation(););", text: "Pau", textsize: 18.0},
+    {name: "Text373", type: "Button", pos: [4.0, -1.5323943661971828, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.737, 0.467], fillalpha: 0.47, script: "sorg=sstart;Dirflg=-Dirflg;Animeflg=1;resetclock();\n        playanimation();", text: "Rev", textsize: 18.0},
+    {name: "Text374", type: "Button", pos: [4.0, -1.7183098591549293, 0.056338028169014086], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.741, 0.467], fillalpha: 0.47, script: "stopanimation();Animeflg=\"\";sstart=Current;", text: "Stp", textsize: 18.0}
   ],
   ports: [{
-    width: 1019,
-    height: 649,
+    width: 1070,
+    height: 658,
     id: "CSCanvas",
-    transform: [{visibleRect: [8.498228741049642, 27.348845221196125, 113.46422979716584, -39.503887541727735]}],
+    transform: [{visibleRect: [8.498228741049642, 27.348845221196125, 118.71768029163289, -40.430967040751334]}],
     grid: 5.0,
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
-  cinderella: {build: 2080, version: [3, 0, 2080]}
+  cinderella: {build: 2083, version: [3, 0, 2083]}
 });
     </script>
 </head>
@@ -4660,6 +4678,38 @@ var cdy = CindyJS({
 KeTTask001-1
 </font></p></header>
     <div id="CSCanvas"></div>
+<div style="padding: 50px">
+<p><font size="10">&emsp;<b>KeTMath数式ルール</b></font></p>
+<ol><font size="5">
+	<li>分数　<b>fr(a,b)</b>　注) 小さい分数 <b>tfr(a,b)</b></li>
+<li>掛け算　<b>ab</b>　注) <b>a*b</b>も可</li>
+<li>べき乗　<b>a^(b)</b>　注) 1文字の場合は<b>a^b</b>も可</li>
+<li>平方根　<b>sq(a)</b>，3乗根　<b>sq(3,a)</b></li>
+<li>三角関数　<b>sin(x)</b>，sin(x)の2乗　<b>sin(2,x)またはsin(x)^(2)</b></li>
+<li>円周率　<b>pi</b>
+<li>度　<b>(deg)</b></li>
+<li>対数関数　<b>log(x)</b>，自然対数　<b>ln(x)</b>，底がa　 <b>log(a,x)</b></li>
+<li>改行　<b>//</b></li>
+<li>スペース　<b>(sp)</b>　注) \;を出力</li>
+<li>立体　<b>100tx(m)</b></li>
+<li>不定積分　<b>int(x^2,dx)</b>，定積分　<b>int(a,b,x^2,dx)</b><br>
+	　注）定積分の関数の括弧を外すときは先頭に<b>!</b>を追加
+<li>ブラケット　<b>br(f(x),a,b)</b></li>
+<li>極限　<b>lim(x,a,f(x))</b>　注）括弧を外すときは先頭に <b>!</b></li>
+<li>和　<b>sum(k=1,n,k^2)</b>　注）括弧を外すときは先頭に <b>!</b></li></li>
+<li>微分　<b>diff(y,x)</b>，偏微分　<b>par(z,x)</b></li>
+<li>行列　<b>mat(a,b;c,d)</b>，行列式　<b>det(a,b;c,d)</b></li>
+<li>場合分け　<b>case(a,(x<0);c,(x(geq)0))</b>
+<li>ドット　1点　<b>dot()</b>，3点　<b>dot(s)</b>，下3点　<b>dot(l)</b>
+<li>掛け算×　<b>(cross)</b></li>
+<li>複号　<b>(pm),(mp)</b></li>
+<li>不等号　<b><, >, (leq), (geq),(neq)</b></li>
+<li>下添字　<b>a_n</b></li>
+<li>全角文字を混ぜてもよい　<b>2x-3=0の解はx=fr(3,2)</b><br>
+<li>ギリシャ文字 <b>{\alpha},{\beta}</b></li>
+<li>その他のTeX 記号　(sp),コンマ,{}などで区切る</li>
+</ol></font>
+</div>
 <footer><p align="center"><font size="4">&copy; 2021 Setsuo Takato</font></p></footer>
 </body>
 </html>

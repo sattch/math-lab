@@ -1,0 +1,71 @@
+/////////////////////  Initialization/KETlib ///////////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+s1flg=0;
+s2flg=0;
+
+///////////////////// Draw/figures //////////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Label=[]","Color=offwhite"]);
+
+Seteditable(50,["a=","Size=18","Width=100"]);
+Movetojs(Text50,[-11,12],18); //only ketjs
+Seteditable(51,["b=","Size=18","Width=100"]);
+Movetojs(Text51,[-11,10.5],18); //only ketjs
+
+
+Setwindow([-10,10],[-10,10]);
+dL=XMIN..XMAX;
+dL=dL--[0];
+forall(1..length(dL),
+  Listplot("do1"+text(#),[[XMIN,dL_#],[XMAX,dL_#]],["do"]);
+  Listplot("do2"+text(#),[[dL_#,YMIN],[dL_#,YMAX]],["do"]);
+);
+Htickmark([-10,"-10",-9,"",-8,"",-7,"",-6,"",-5,"-5",-4,"",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"",5,"5",6,"",7,"",8,"",9,"",10,"10"]);
+Vtickmark([-10,"-10",-9,"",-8,"",-7,"",-6,"",-5,"-5",-4,"",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"",5,"5",6,"",7,"",8,"",9,"",10,"10"]);
+
+CNum(NL):=(
+  regional(zx,zy,zn,cnz);
+  zx=NL_1; zy=NL_2;
+  cnz=text(zx)+"+"+text(zy)+"i";
+  zn=NL_3;
+  Expr([zx,zy],"n2",zn+"="+cnz,["Size=1.5"]);
+);
+
+str1="a=5";//no ketjs
+//str1=Textedit(50); //only ketjs
+tmp1=Strsplit(str1,"=");
+aa=parse(tmp1_2);
+
+str2="b=3";//no ketjs
+//str2=Textedit(51); //only ketjs
+tmp2=Strsplit(str2,"=");
+bb=parse(tmp2_2);
+
+
+Paramplot("1","["+text(aa)+"*cos(t),"+text(bb)+"*sin(t)]","t=[0,2*pi]",["do"]);
+
+Slider("S",[-11,-(aa-bb)],[-11,aa-bb],["Size=5"]);
+cc=S.y;
+Putpoint("C",[0,cc],[0,cc]);
+
+th=arcsin(cc/(aa-bb));
+Putpoint("P",[5,0],P.xy);
+
+if(s1flg==1,
+  Paramplot("1","["+text(aa)+"*cos(t),"+text(bb)+"*sin(t)]","t=[-pi/2,pi/2]",["do"]);
+  Putpoint("P",[aa*cos(-th),bb*sin(-th)],[aa*cos(-th),bb*sin(-th)]);
+  Listplot("1",[C,P],["dr,2","Color=blue"]);
+);
+
+if(s2flg==1,
+  Paramplot("1","["+text(aa)+"*cos(t),"+text(bb)+"*sin(t)]","t=[pi/2,pi/2*3]",["do"]);
+  Putpoint("P",[-aa*cos(-th),bb*sin(-th)],[-aa*cos(-th),bb*sin(-th)]);
+  Listplot("1",[C,P],["dr,2","Color=blue"]);
+);
+
+Windispg();

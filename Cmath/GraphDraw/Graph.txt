@@ -143,8 +143,8 @@ if(Strnq!=Strnow,
 );
 
 Rstr=Strnq;
-Rtexstr=Totexform(Strnq);
-
+Rtexstr=Totexform(Rstr);
+Rcdystr=Tocindyform(Rstr);
 
 
 ////////// xy座標の設定 //////////
@@ -165,7 +165,7 @@ if(length(str1)>0,
 Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
 
 ////////// グラフの設定 //////////
-str0=Rstr;
+str0=Rcdystr;
 if(length(str0)>0,
   regional(tmp);
   Plotdata("1",str0,"x=[-"+text(str1)+","+text(str1)+"]",["nodisp","Num=1000"]);

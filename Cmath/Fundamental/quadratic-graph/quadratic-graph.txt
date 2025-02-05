@@ -1,0 +1,45 @@
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1","Label=[]","Color=offwhite"]);
+
+////////// xy座標の設定 //////////
+Setwindow([-5,5],[-5,5]);
+
+Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
+Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
+
+////////// スライダーの設定 /////////
+Slider("A",[6,YMIN],[6,YMAX],["Size=3"]);
+inspect(A,"ptsize","7");
+aa=round(A.y);
+Expr(A.xy+[0.2,0],"e1","a="+text(aa));
+
+Slider("B",[XMIN,-6],[XMAX,-6],["Size=3"]);
+inspect(B,"ptsize","7");
+bb=round(B.x);
+Expr(B.xy+[0,-0.2],"s1","b="+text(bb));
+
+Slider("C",[8,YMIN],[8,YMAX],["Size=3"]);
+inspect(C,"ptsize","7");
+cc=round(C.y);
+Expr(C.xy+[0.2,0],"e1","c="+text(cc));
+
+////////// 表示の設定 //////////
+Plotdata("0","x^2","x=[-sqrt(YMAX),sqrt(YMAX)]",["Color=[0,0.5,0,0]"]);
+Expr([sqrt(YMAX),YMAX],"n","y=x^2",["Color=[0,0.5,0,0]"]);
+
+tmp=text(aa)+"x^2+"+text(bb)+"x+"+text(cc);
+tmp=replace(tmp,"0x^2+","");
+tmp=replace(tmp,"1x^2","x^2");
+tmp=replace(tmp,"-1x^2","-x^2");
+tmp=replace(tmp,"0x+","");
+tmp=replace(tmp,"1x","x");
+tmp=replace(tmp,"-1x","-x");
+tmp=replace(tmp,"+0","");
+tmp=replace(tmp,"+-","-");
+texexp=Totexform(tmp);
+cdyexp=Tocindyform(tmp);
+Letter([2,5.7],"e","関数$y="+texexp+"$",["Size=1.2"]);
+Plotdata("1",cdyexp,"x",["Num=200","dr,2"]);
+
+Windispg();

@@ -17,7 +17,7 @@ Expr(A.xy+[0.2,0],"e1","a="+text(aa));
 Slider("B",[XMIN,-6],[XMAX,-6],["Size=3"]);
 inspect(B,"ptsize","7");
 bb=round(B.x);
-Expr(B.xy+[0,-0.2],"s1","b="+text(bb));
+Expr(B.xy+[0,0.2],"n1","b="+text(bb));
 
 Slider("C",[8,YMIN],[8,YMAX],["Size=3"]);
 inspect(C,"ptsize","7");

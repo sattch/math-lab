@@ -1,3 +1,33 @@
+/////////////////////////// keynamelib.txt ///////////////////////////////
+Str="";
+StrL=[];
+Strnow="";
+Strt="";
+Strc="";
+Strnq="";
+Texstr="";
+Nfun=1;
+npos=2;
+dispflg=0;
+tpos=[11,9.8];
+dpos=[0,-1];
+ch=2;
+
+//     ["BS","CL","<",">",">>"],
+
+Keyname():=(
+  regional(nL);
+  nL=[
+    ["fr(","sq(","^(","$e$^(","log"],
+    ["(",")","7","8","9"],
+    ["sin","cos","4","5","6"],
+    ["$+$","$-$","1","2","3"],
+    ["$\ast$","$,$","0","$\pi$","$x$"]
+  ];
+  nL;
+);
+
+
 /////////////////////////// KETlib ////////////////////////////
 use("KetCindyPlugin");
 Dircdy=loaddirectory;
@@ -111,9 +141,9 @@ str1="5"; //no ketjs
 
 //////////////// 数式入力の設定 /////////////////
 nameL1=[["BS","AC","<",">",">>"]];
-Keytable(5,9.8,1,7,[7.5,1.3],[0,1,0],nameL1,[0,-0.2],20);
+Keytable(5,9.8,1,7,[7.5,0.3],[0,1,0],nameL1,[0,-0.2],20);
 nameL2=Keyname();
-Keytable(5,9.8,5,7,[7.5,-2.2],[1,1,0],nameL2,[0,-0.2],20);
+Keytable(5,9.8,5,7,[7.5,-3.2],[1,1,0],nameL2,[0,-0.2],20);
 
 if(funflg==1,
   if(contains(Manifun,name),
@@ -147,6 +177,7 @@ Rtexstr=Totexform(Rstr);
 Rcdystr=Tocindyform(Rstr);
 
 
+
 ////////// xy座標の設定 //////////
 Setwindow([-5,5],[-5,5]);
 
@@ -162,7 +193,8 @@ if(length(str1)>0,
   Letter([6,3.7],"e","値　域：$-"+text(str1)+"\,\leq y\leq\,"+text(str1)+"$",["Size=1.2"]);
 );
 
-Letter([6,2.7],"e","関数$y=$",["Size=1.2"]);
+Expr([6.7,2.7],"e","y="+Rtexstr,["Size=1.2"]);
+Letter([6,1.7],"e","関数$y=$",["Size=1.2"]);
 
 ////////// グラフの設定 //////////
 str0=Rcdystr;
@@ -191,3 +223,4 @@ if(length(str0)>0,
 );
 
 Windispg();
+

@@ -9,7 +9,7 @@
             margin: 0px;
             padding: 0px;
         }
-        
+
         #CSConsole {
             background-color: #FAFAFA;
             border-top: 1px solid #333333;
@@ -2247,9 +2247,28 @@ Subsedit(no,str):=(
  tmp="Text"+text(no); //210211[2lines]
  parse(tmp).currenttext=tmp1;
 );
-Totexform(str):=( //231215
-  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,
-    post,ctr,clv,nn,tmp,tmp1,tmp2,tmp3,tmp4);
+Textedit(no):=(
+  regional(tmp,tmp1,tmp2);
+  tmp="Text"+text(no)+".currenttext";
+  tmp1=parse(tmp);
+  tmp1;
+);
+Textedit(n0,str):=Textedit(n0,str,"="); //210406from
+Textedit(n0,str,sep):=( //210208from
+  regional(tmp,tmp1,tmp2,out);
+  tmp1=str;
+tmp1=Textedit(n0); //
+  tmp2=tmp1;
+  if(length(sep)>0,
+    tmp=Strsplit(sep+tmp1,sep);
+    tmp2=tmp_(-1);
+  ); //210406to
+  if(length(tmp2)==0,out=str,out=tmp2);
+  out;
+); //210208to
+Totexform(str):=( //210803from[renew]
+  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,post,ctr,clv,nn,
+      tmp,tmp1,tmp2,tmp3,tmp4);
   tmp1="\displaystyle\int"; //210831from
   tmp2="\displaystyle\lim";
   tmp3="\displaystyle\sum"; //210831to
@@ -2258,7 +2277,7 @@ Totexform(str):=( //231215
     ["_(",["_{xx}"]], //210831
     ["tx(",["\text{xx}"]], //210907
     ["tfr(",["","\frac{xx}{yy}"]], //210831,220523
-    ["fr(",["","\displaystyle\frac{xx}{yy}"]], //210228from 231224
+    ["fr(",["","\dfrac{xx}{yy}"]], //210228from
     ["log(",["\log xx ","\log_{xx} yy"]], //210405
     ["ln(",["\ln xx "]], //210903
     ["sq(",["\sqrt{xx}","\sqrt[xx]{yy}"]],
@@ -2267,7 +2286,7 @@ Totexform(str):=( //231215
     ["cos(",["\cos xx ","\cos^{xx}\! yy "]], //210405
     ["tan(",["\tan xx ","\tan^{xx}\! yy "]],  //210228to  //210405
     ["lim(", ["",tmp2+"_{xx \to yy} ",tmp2+"_{xx \to yy} zz"]], //210831from
-    ["int(", [tmp1+" ",tmp1+" xx yy ",tmp1+" yy zz ",tmp1+"_{xx}^{yy} zz ww "]],  //211027
+    ["int(", [tmp1+" ",tmp1+" xx dyy ",tmp1+" yy dzz ",tmp1+"_{xx}^{yy} zz dww "]],  //211027
     ["sum(", ["",tmp3+"_{xx}^{yy} ", tmp3+"_{xx}^{yy} zz"]], //210831to
     ["diff(", ["d ","\frac{dxx}{dyy}"]], //210913
     ["par(", ["\partial ","\frac{\partial xx}{\partial yy}"]] ,//210913
@@ -2275,27 +2294,6 @@ Totexform(str):=( //231215
   ];
   parL=["log(","sin(","cos(","tan(","lim(","int(","sum("]; //210901
   out=replace(str,"pi","{\pi}"); //210805
-  out=replace(out,"frac(","fr(");//231227
-  out=replace(out,"sqrt(","sq(");//231215 from
-  tmp=indexof(out,")/(");
-  ctr=1;
-  while((tmp>0)&(ctr<20),
-    tmp1=substring(out,0,tmp);
-    tmp2=substring(out,tmp+1,length(out));
-    tmp=Bracket(tmp1);
-    tmp3=tmp_(-1)_2;
-    tmp=select(tmp,#_2==-tmp3);
-    tmp=tmp_(-1)_1;
-    tmp1=substring(tmp1,0,tmp-1)+"fr("+
-           substring(tmp1,tmp,length(tmp1)-1)+",";
-    tmp=Bracket(tmp2);
-    tmp=select(tmp,#_2==-1);
-    tmp=tmp_1_1;
-    tmp2=substring(tmp2,1,length(tmp2));
-    out=tmp1+tmp2;
-    tmp=indexof(out,")/(");
-    ctr=ctr+1;
-  );//231215 to
   head="";
   flg=0;
   plv=Bracket(out,"()");
@@ -2340,11 +2338,6 @@ Totexform(str):=( //231215
        if(nn==2,
           tmp1=substring(out,plv_1_1,clv_1_1-1);
           tmp2=substring(out,clv_1_1,length(out)-1);
-		  if(indexof(out,"int(")>0, //231227from
-		    if((length(tmp2)>0)&(substring(tmp2,0,1)!="d"),
-			  tmp2="d"+tmp2;
-            );
-          ); //231227to
           if(contains(parL,fun), //210901from
             tmp2=Addpar(tmp2); //211029
           ); //210901to
@@ -2370,11 +2363,6 @@ Totexform(str):=( //231215
             tmp3=Addpar(tmp3); //211029
           ); //210901to
           tmp4=substring(out,clv_3_1,length(out)-1);
-		  if(indexof(out,"int(")>0, //231227from
-		    if((length(tmp4)>0)&(substring(tmp4,0,1)!="d"),
-			  tmp4="d"+tmp4;
-            );
-          );//231227to
           tmp=replace(rep_2_4,"xx",tmp1);
           tmp=replace(tmp,"yy",tmp2);
           tmp=replace(tmp,"zz",tmp3);
@@ -2687,25 +2675,6 @@ Htickmark(nm,arglist,options):=(
     Expr([GENTEN+[tmp1,0],tmp2,tmp3],options); 
   );
 );
-Textedit(no):=(
-  regional(tmp,tmp1,tmp2);
-  tmp="Text"+text(no)+".currenttext";
-  tmp1=parse(tmp);
-  tmp1;
-);
-Textedit(n0,str):=Textedit(n0,str,"="); //210406from
-Textedit(n0,str,sep):=( //210208from
-  regional(tmp,tmp1,tmp2,out);
-  tmp1=str;
-tmp1=Textedit(n0); //
-  tmp2=tmp1;
-  if(length(sep)>0,
-    tmp=Strsplit(sep+tmp1,sep);
-    tmp2=tmp_(-1);
-  ); //210406to
-  if(length(tmp2)==0,out=str,out=tmp2);
-  out;
-); //210208to
 Deffun(name,bodylist):=(
   regional(funstr,str,pos,nbody,bdy,ppL,bpL,excma,tmp,tmp1,tmp2);
   funstr=name+":=(";
@@ -3260,7 +3229,7 @@ Arrowhead(nm,pointorg,directionorg,optionsorg):=(//191129remade
        options=remove(options,[#]);
      );
   );
-   list=Arrowheaddata(point,direction,options);
+  list=Arrowheaddata(point,direction,options);
   if(length(point)>1, //210724from
     if(!Inwindow(point),Noflg=2);
     if(isstring(direction),
@@ -3300,18 +3269,9 @@ Arrowhead(nm,pointorg,directionorg,optionsorg):=(//191129remade
 );
 Arrowheaddata(point,direction):=
    Arrowheaddata(point,direction,[YaSize,YaAngle,YaPosition,YaCut]);
-Arrowheaddata(pointorg,directionorg,options):=( //191127remade
-  regional(point,direction,scaley,Eps,size,angle,segpos,cut, 
-            Houkou,hflg,Str,Ev,Nv,reL,pP,vec,
-            pA,pB,pC,par,out,tmp,tmp1,tmp2);
-  point=Pcrd(pointorg); //230830from
-  tmp=directionorg;
-  if(isstring(tmp),
-    tmp=parse(tmp);
-    direction=apply(tmp,Pcrd(#)); //230830to 
-  ,
-    direction=Pcrd(tmp);
-  );
+Arrowheaddata(point,direction,options):=( //191127remade
+  regional(scaley,Eps,size,angle,segpos,cut, Houkou,hflg,Str,Ev,Nv,
+       reL,pP,vec,pA,pB,pC,par,out,tmp,tmp1,tmp2);
   Eps=10^(-4);
   tmp=Divoptions(options);
   reL=tmp_6;
@@ -4826,12 +4786,10 @@ forall(1..length(x1L),
 );
 
 Expr([5.5,7],"e","y=",["Size=1"]);
-str0="x^2";
-str0=Textedit(10,str,"");//
-if(length(str0)>0,
-  expr=str0;
+if(length(Rstr)>0,
+  expr=Rtexstr;
   Expr([5.5,8],"e","y="+expr,["Size=1"]);
-  Deffun("f(x)",["regional(y)","y="+str0+"+5","y"]);
+  Deffun("f(x)",["regional(y)","y="+Rcdystr+"+5","y"]);
   Plotdata("1","f(x)","x",["Num=100","nodisp"]);
   fL=[];
   forall(1..length(gr1),
@@ -4915,6 +4873,7 @@ if(wflg==1,
 if(rflg==1,
   funflg=1;name="Allclear()";
   wflg=0;
+  Putpoint(X,[-2,0],[-2,0]);
   Putpoint(Q1,[-2,-5],[-2,-5]);
   Putpoint(Q2,[-1,-5],[-1,-5]);
   Putpoint(Q3,[0,-5],[0,-5]);
@@ -4944,7 +4903,7 @@ var cdy = CindyJS({
     {name: "Text10", type: "EditableText", pos: [-3.764705882352942, -4.0, -0.5882352941176471], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 200, script: "funflg=1;", textsize: 18.0},
     {name: "SW", type: "Free", pos: [-2.2222222222222223, -4.0, 0.4444444444444444], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [-2.2222222222222223, -4.0, -0.4444444444444444], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "X", type: "Free", pos: [0.0, 0.0, 4.0], color: [1.0, 0.0, 0.0], labeled: false, size: 5.1, border: true },
+    {name: "X", type: "Free", pos: [4.0, -0.0, -2.0], color: [1.0, 0.0, 0.0], labeled: false, size: 5.1, border: true },
     {name: "Q1", type: "Free", pos: [-1.6, -4.0, 0.8], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
     {name: "Q2", type: "Free", pos: [-0.8, -4.0, 0.8], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
     {name: "Q3", type: "Free", pos: [0.0, -4.0, 0.8], color: [1.0, 0.0, 0.0], labeled: false, size: 3.0, border: true },
@@ -4985,17 +4944,17 @@ var cdy = CindyJS({
     {name: "Text12", type: "Button", pos: [4.0, -3.0, 0.4], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 0.0, 0.0], fillalpha: 0.27272728085517883, script: "rflg=1;", text: "リセット", textsize: 18.0}
   ],
   ports: [{
-    width: 732,
-    height: 698,
     id: "CSCanvas",
-    transform: [{visibleRect: [-6.077633154710664, 9.486020618036013, 14.00860134100627, -9.678222786074244]}],
+    width: 732,
+    height: 678,
+    transform: [{visibleRect: [-6.075262728622581, 9.466872815604294, 14.010971767094354, -9.137590282887622]}],
     grid: 1.0,
     snap: true,
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
   use: ["katex"],
-  cinderella: {build: 2088, version: [3, 0, 2088]}
+  cinderella: {build: 2039, version: [3, 0, 2039]}
 });
     </script>
 </head>

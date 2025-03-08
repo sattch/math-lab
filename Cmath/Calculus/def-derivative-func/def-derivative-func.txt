@@ -143,6 +143,7 @@ Setketcindyjs(["Sc=1.2"]);
 Setwindow([-5,5],[-9,9]);
 Addax(0);
 
+/////////////// キーボード入力 //////////////
 nameL1=[["BS","AC","<",">",">>"]];
 Keytable(5,12.7,1,9,[6,5.1],[0,1,0],nameL1,[0,-0.2],20);
 nameL2=Keyname();
@@ -208,12 +209,10 @@ forall(1..length(x1L),
 
 //////////// y=f(x)のグラフ ///////////
 Expr([5.5,7],"e","y=",["Size=1"]);
-str0="x^2";
-//str0=Textedit(10,str,"");//only ketjs
-if(length(str0)>0,
-  expr=str0;
+if(length(Rstr)>0,
+  expr=Rtexstr;
   Expr([5.5,8],"e","y="+expr,["Size=1"]);
-  Deffun("f(x)",["regional(y)","y="+str0+"+5","y"]);
+  Deffun("f(x)",["regional(y)","y="+Rcdystr+"+5","y"]);
   Plotdata("1","f(x)","x",["Num=100","nodisp"]);
   fL=[];
   forall(1..length(gr1),
@@ -301,6 +300,7 @@ if(wflg==1,
 if(rflg==1,
   funflg=1;name="Allclear()";
   wflg=0;
+  Putpoint(X,[-2,0],[-2,0]);
   Putpoint(Q1,[-2,-5],[-2,-5]);
   Putpoint(Q2,[-1,-5],[-1,-5]);
   Putpoint(Q3,[0,-5],[0,-5]);

@@ -1,0 +1,270 @@
+Dq=unicode("0022");
+
+NE.visible=false;
+SW.visible=false;
+
+create(["R1"],"FreePoint",[[1,1,1]]);
+R1.labelled=false;R1.size=5;
+
+create(["Text10"],"EditableText",[[5,5,1]]);
+Seteditable(0,["","Size=24","Width=300"]);
+Text10.xy=[7.3,-2];
+inspect(Text10,"textsize",18);
+inspect(Text10,"colorfill",0);
+inspect(Text10,"fillalpha",1);
+inspect(Text10,"text.minwidth",190);
+
+Ucreate(uc1,uc2,uc3,uc4):=(
+ create([uc1],"Text",[[5,5,1]]);
+ parse(uc1+".text=uc2");
+ parse(uc1+".xy=uc3");
+ parse(uc1+".color=[0,0,0]");
+// parse(uc1+".fillalpha=0");
+// inspect(parse(uc1),"colorfill",8);
+ inspect(parse(uc1),"colorfill",0);
+ inspect(parse(uc1),"text.minwidth",33);
+ inspect(parse(uc1),"textsize",20);
+ inspect(parse(uc1),"textbutton","true");
+ inspect(parse(uc1),"texttoggle","true");
+ inspect(parse(uc1),"button.script",uc4);
+// inspect(parse(uc1),"alpha",1);
+ inspect(parse(uc1),"fillalpha",0.2);
+);
+
+Ucreate("Text3","Ketjsoff",[10,3],"Button3();");//no ketjs
+Button3():=(Mkketcindyjs(append(KETJSOP,"Web=n")););// no ketjs
+
+
+
+Ucreate("Text100","出題",[11.2,-5.5],"Button100();");
+Button100():=(
+ pbflg=1;ansflg=0;rflg=10;QL=1;
+ funflg=1;name="Allclear()";Ushownum=0;
+ pbno=mod(pbno+1,Uplen);
+);
+
+Ucreate("Text99","入力",[11.2,-7],"Button99();");
+Button99():=(
+ Button100();
+ ansflg=7;rflg=9;
+ Subsedit(10,BM1strnq);
+);
+
+Ucreate("Text104","　",[-1,3.6],"Button104();");
+Button104():=(
+   ansflg=4;rflg=4;
+   Subsedit(10,A123B_1_(QL+1));
+);
+
+Ucreate("Text105","　",[-1,2.1],"Button105();");
+Button105():=(
+    ansflg=5;rflg=5;
+    Subsedit(10,A123B_2_(QL+1));
+);
+
+Ucreate("Text106","　",[-1,0.6],"Button106();");
+Button106():=(
+     ansflg=6;rflg=6;
+     Subsedit(10,A123B_3_(QL+1));
+);
+
+Ucreate("Text111","答え合わせ",[-2,-5.8],"caflg=mod(caflg+1,2);");
+
+Ucreate("Text150","　",[1,-5.8],"ansflg=9;rflg=8;");
+
+Ucreate("Text4","　　",[4.4,-5.8],"Button4();");
+Button4():=(
+ if(ansflg>3 & ansflg<7,
+  if(QL<Lnum,
+   QL=QL+1;
+   if(QL==Lnum,
+    Subsedit(10,"");
+   ,
+    Subsedit(10,A123B_QR_(QL+1));
+   );
+  );
+ );
+);
+
+Ucreate("Text5","　　",[2,-5.8],"Button5();");
+Button5():=(
+ if(ansflg>3 & ansflg<7,
+  if(QL>1,
+   QL=QL-1;
+   Subsedit(10,A123B_QR_(QL+1));
+  );
+ );
+);
+
+Ucreate("Text201","↑$>$",[11.2,-3],"Button201();");
+Button201():=(
+ funflg=1;name="UB()";
+);
+
+Ucreate("Text202","↑$<$",[11.2,-4],"Button202();");
+Button202():=(
+ funflg=1;name="UF()";
+);
+
+UB():=(
+ if(length(Str)>0,
+  Ustr=Ustr+Str_1;
+  Str=substring(Str,1,length(Str));
+ );
+);
+
+UF():=(
+ if(length(Ustr)>0,
+  Str=Ustr_(length(Ustr))+Str;
+  Ustr=substring(Ustr,0,length(Ustr)-1);
+ );
+);
+
+Ucreate("Text211","↑",[-2,-1.7],"Button211();");
+Button211():=(
+ if(Ushownum>0,
+  Ushownum=Ushownum-1;
+//  R1.xy=Text221.xy+[0,1.2];
+  if(rflg==1,
+   rflg=2;
+  ,
+   if(rflg==2,
+    rflg=3;
+   ,
+//    if(ansflg==Ushownum,rflg=1);
+    if(rflg==3&(ansflg==Ushownum),rflg=1);
+   );
+  );
+ );
+);
+
+Ucreate("Text212","↓",[-2,-2.7],"Button212();");
+Button212():=(
+ if(Ushownum<2,
+  Ushownum=Ushownum+1;
+//  R1.xy=Text221.xy+[0,1.2];
+  if(rflg==2,
+   rflg=1;
+  ,
+   if(rflg==1,
+    rflg=3;
+   ,
+    if(ansflg==Ushownum+1,rflg=2);
+   );
+  );
+ );
+);
+
+Ucreate("Text221","　",[-1,-1.7],"Button221();");
+Button221():=(
+// ansflg=Ushownum;
+// Subsedit(10,"");
+ if(Ushownum==1,
+  ansflg=1;rflg=1;
+  Subsedit(10,M1strnq);
+ );
+ if(Ushownum==2,
+  if(Stagenum<1,
+   ansflg=12;rflg=7;
+  ,
+   ansflg=2;rflg=1;
+   Subsedit(10,M2strnq);
+  );
+ );
+ Ustr="";
+);
+
+Ucreate("Text222","　",[-1,-2.7],"Button222();");
+Button222():=(
+// ansflg=Ushownum+1;
+// Subsedit(10,"");
+ if(Ushownum==0,
+  ansflg=1;rflg=2;
+  Subsedit(10,M1strnq);
+ );
+ if(Ushownum==1,
+  if(Stagenum<1,
+   ansflg=12;rflg=7;
+  ,
+   ansflg=2;rflg=2;
+   Subsedit(10,M2strnq);
+  );
+ );
+ if(Ushownum==2,
+  if(Stagenum<1,
+   ansflg=12;rflg=7;
+  ,
+   ansflg=3;rflg=2;
+   Subsedit(10,M3strnq);
+  );
+ );
+ Ustr="";
+);
+
+nameL1=[["BS","AC","<",">"]];
+nameL2=[
+    ["fr(","(",",",")"],
+    ["sq(","7","8","9"],
+    ["^(","4","5","6"],
+    ["$x$","1","2","3"]
+//    [".","0","$+$","$-$"]
+  ];
+
+a=[6.1,7.3,8.5,9.7];
+b=[-3.3,-4.5,-5.7,-6.9,-8.1];
+ccc=[
+    ["Delete()","Allclear()","Left()","Right()"],
+    ["fr(","(",",",")"],
+    ["sq(","7","8","9"],
+    ["^(","4","5","6"],
+    ["x","1","2","3"],
+//    [".","0","+","-"]
+  ];
+
+repeat(5,i,
+ repeat(4,j,
+  textstr="Text"+text(i)+text(j);
+  scriptstr="funflg=1;name="+Dq+ccc_i_j+Dq+";";
+  Ucreate(textstr,"　　",[a_j,b_i],scriptstr);
+  inspect(parse(textsyr),"alpha",0);
+  inspect(parse(textsyr),"fillalpha",0);
+ );
+);
+
+
+a=[2,3.2,4.4];
+
+nameL4=[["0","$+$","$-$"]];
+b=-6.9;
+ccc=["0","+","-"];
+repeat(3,i,
+  textstr="Text8"+text(i);
+  scriptstr="funflg=1;name="+Dq+ccc_i+Dq+";";
+  Ucreate(textstr,"　　",[a_i,b],scriptstr);
+);
+
+nameL5=[["$\cdots$","$\nearrow$","$\searrow$"]];
+b=-8.1;
+ccc=["\cdots","NE","SE"];
+repeat(3,i,
+  textstr="Text8"+text(i+3);
+//  scriptstr="funflg=1;name="+Dq+ccc_i+Dq+";";
+  scriptstr="Allclear();Text10.text="+Dq+ccc_i+Dq+";";
+  Ucreate(textstr,"　　",[a_i,b],scriptstr);
+);
+
+
+//////////////////////////////////////////////
+Prbstr0="y=2x^3-3x^2-12x+6";
+Prbstr1="y=-x^3-4x^2+3x+2";
+Prbstr2="y=x^3+3x^2+3x-4";
+Prbstr3="y=-x^3+9x";
+Prbstr4="y=x^3+9x";
+Prbstr5="y=-2x^2+3x-1";
+Prbstr6="y=3x^4+4x^3-12x^2+4";
+Prbstr7="y=-3x^4+4x^3+6x^2-12x+2";
+Prbstr8="y=3x^4+4x^3+6x^2-3";
+Prbstr9="y=x^4+4x^3+6x^2+4x+3";
+Uprb=[Prbstr0,Prbstr1,Prbstr2,Prbstr3,Prbstr4,Prbstr5,Prbstr6,Prbstr7,Prbstr8,Prbstr9];
+Uplen=length(Uprb);
+

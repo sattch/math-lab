@@ -1,0 +1,333 @@
+///////////////////////// ketnamelib.txt /////////////////////////
+Str="";
+StrL=[];
+Strnow="";
+Strt="";
+Strc="";
+Strnq="";
+Texstr="";
+Nfun=1;
+npos=2;
+dispflg=0;
+tpos=[11,9.8];
+dpos=[0,-1];
+ch=2;
+
+//     ["BS","CL","<",">",">>"],
+
+Keyname():=(
+  regional(nL);
+  nL=[
+    ["^(","sin","cos","(",")"],
+    ["7","8","9","x","t",],
+    ["4","5","6","+","-"],
+    ["1","2","3","*","/"],
+    ["0","$\pi$","$e$","fr(",","]
+  ];
+  nL;
+);
+
+///////////////////////// initialize/KETlib /////////////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+setdirectory(Dircdy);
+import("ketcindylibkey.cs");//funflg=0;
+import("keynamelib.txt");
+
+Seteditable(10,["","Size=18","Width=200"]);
+Text10.xy=[6.4,6.8];//関数式の入力窓
+//Seteditable(51,["","Size=18","Width=200"]);
+
+Text11.xy=[7,-9];//「線を引く」ボタン
+Text12.xy=[10,-9];//「リセット」ボタン
+Text13.xy=[5.5,10.25];//「問題」ボタン
+
+wflg=0;
+rflg=0;
+
+
+ky="";
+ansflg=0;
+
+fnflg=0;
+detflg=0;
+stage=0;
+Str="";
+Strnow="";
+M1strnq="";
+M2strnq="";
+
+drwt(line,str):=(
+  drawtext([-5,poy],text(line)+" "+str,size->15);
+  poy=poy-0.8;
+);
+
+ky="";
+flg=-1;
+
+Pxy=[6.1,5.33];
+Bx=[1.28,0];
+By=[0,-0.91];
+
+inspect(Text20,"button.script","funflg=1;name="+Dq+"Delete()"+Dq+";");
+Text20.xy=Pxy;
+inspect(Text21,"button.script","funflg=1;name="+Dq+"Allclear()"+Dq+";");
+Text21.xy=Pxy+Bx;
+inspect(Text22,"button.script","funflg=1;name="+Dq+"Left()"+Dq+";");
+Text22.xy=Pxy+Bx*2;
+inspect(Text23,"button.script","funflg=1;name="+Dq+"Right()"+Dq+";");
+Text23.xy=Pxy+Bx*3;
+inspect(Text23,"button.script","funflg=1;name="+Dq+"RRight()"+Dq+";");
+Text24.xy=Pxy+Bx*4;
+
+inspect(Text30,"button.script","funflg=1;name="+Dq+"^("+Dq+";");
+Text30.xy=Pxy+By;
+inspect(Text31,"button.script","funflg=1;name="+Dq+"sin("+Dq+";");
+Text31.xy=Pxy+By+Bx;
+inspect(Text32,"button.script","funflg=1;name="+Dq+"cos("+Dq+";");
+Text32.xy=Pxy+By+Bx*2;
+inspect(Text33,"button.script","funflg=1;name="+Dq+"("+Dq+";");
+Text33.xy=Pxy+By+Bx*3;
+inspect(Text34,"button.script","funflg=1;name="+Dq+")"+Dq+";");
+Text34.xy=Pxy+By+Bx*4;
+
+inspect(Text35,"button.script","funflg=1;name="+Dq+"7"+Dq+";");
+Text35.xy=Pxy+By*2;
+inspect(Text36,"button.script","funflg=1;name="+Dq+"8"+Dq+";");
+Text36.xy=Pxy+By*2+Bx;
+inspect(Text37,"button.script","funflg=1;name="+Dq+"9"+Dq+";");
+Text37.xy=Pxy+By*2+Bx*2;
+inspect(Text38,"button.script","funflg=1;name="+Dq+"x"+Dq+";");
+Text38.xy=Pxy+By*2+Bx*3;
+inspect(Text39,"button.script","funflg=1;name="+Dq+"t"+Dq+";");
+Text39.xy=Pxy+By*2+Bx*4;
+
+inspect(Text40,"button.script","funflg=1;name="+Dq+"4"+Dq+";");
+Text40.xy=Pxy+By*3;
+inspect(Text41,"button.script","funflg=1;name="+Dq+"5"+Dq+";");
+Text41.xy=Pxy+By*3+Bx;
+inspect(Text42,"button.script","funflg=1;name="+Dq+"6"+Dq+";");
+Text42.xy=Pxy+By*3+Bx*2;
+inspect(Text43,"button.script","funflg=1;name="+Dq+"+"+Dq+";");
+Text43.xy=Pxy+By*3+Bx*3;
+inspect(Text44,"button.script","funflg=1;name="+Dq+"-"+Dq+";");
+Text44.xy=Pxy+By*3+Bx*4;
+
+inspect(Text45,"button.script","funflg=1;name="+Dq+"1"+Dq+";");
+Text45.xy=Pxy+By*4;
+inspect(Text46,"button.script","funflg=1;name="+Dq+"2"+Dq+";");
+Text46.xy=Pxy+By*4+Bx;
+inspect(Text47,"button.script","funflg=1;name="+Dq+"3"+Dq+";");
+Text47.xy=Pxy+By*4+Bx*2;
+inspect(Text48,"button.script","funflg=1;name="+Dq+"*"+Dq+";");
+Text48.xy=Pxy+By*4+Bx*3;
+inspect(Text49,"button.script","funflg=1;name="+Dq+"/"+Dq+";");
+Text49.xy=Pxy+By*4+Bx*4;
+
+inspect(Text50,"button.script","funflg=1;name="+Dq+"0"+Dq+";");
+Text50.xy=Pxy+By*5;
+inspect(Text51,"button.script","funflg=1;name="+Dq+"pi"+Dq+";");
+Text51.xy=Pxy+By*5+Bx;
+inspect(Text52,"button.script","funflg=1;name="+Dq+"e"+Dq+";");
+Text52.xy=Pxy+By*5+Bx*2;
+inspect(Text53,"button.script","funflg=1;name="+Dq+"fr("+Dq+";");
+Text53.xy=Pxy+By*5+Bx*3;
+inspect(Text54,"button.script","funflg=1;name="+Dq+","+Dq+";");
+Text54.xy=Pxy+By*5+Bx*4;
+
+///////////////////////// Draw/figures //////////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1.2"]);
+Setwindow([-5,5],[-9,9]);
+Addax(0);
+
+/////////////// キーボード入力 //////////////
+nameL1=[["BS","AC","<",">",">>"]];
+Keytable(5,12.7,1,9,[6,5.1],[0,1,0],nameL1,[0,-0.2],20);
+nameL2=Keyname();
+Keytable(5,12.7,5,9,[6,0.58],[1,1,0],nameL2,[0,-0.2],20);
+
+if(funflg==1,
+  if(contains(Manifun,name),
+    parse(name+";");
+  ,
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
+    out=Addfunstr(name,npos,Str);
+    tmp=length(out_1)-length(Str);
+    npos=npos+tmp;
+    Str=out_1; //npos=out_2;
+    if(npos<length(Str),
+      tmp=replace(Str,"?","");
+      tmp1=substring(tmp,0,npos-1)+"?";
+      Str=tmp1+substring(tmp,npos-1,length(tmp));
+    );
+  );
+  Subsedit(10,Str);
+  funflg=0;
+  stflg=0;
+);
+
+Str=Textedit(10,"","");
+Str=replace(Str,"frfr","tfr");
+Strnq=replace(Str,"?","");
+if(Strnq!=Strnow,
+  Strnow=Strnq;
+);
+
+Rstr=Strnq;
+Rtexstr=Totexform(Rstr);
+Rcdystr=Tocindyform(Rstr);
+
+/////////////// スライダーの設定 /////////////
+Slider("X",[XMIN,0],[XMAX,0]);
+inspect(X,"ptsize","5.1");
+//xx=round(X.x);
+Expr(X.xy,"n3","x="+format(X.x,1),["Size=1.5"]);
+Htickmark([-5,"",-4,"-4",-3,"",-2,"",-1,"",1,"",2,"",3,"",4,"4",5,""]);
+
+////////////// 上段グラフ用紙の設定 ///////////
+Listplot("x1",[[XMIN,5],[XMAX,5]],["dr,0.75"]);
+Expr([XMAX,5],"e","x");
+Listplot("y1",[[0,1],[0,YMAX]],["dr,0.75"]);
+Expr([0,YMAX],"n","y");
+Letter([0,5],"sw","O");
+Expr([[0,1],"w1","-4",[0,9],"w1","4"]);
+y1L=-3..3;
+y1L=y1L--[0];
+forall(1..length(y1L),
+  Listplot("ty1"+text(#),[[-0.05,y1L_#+5],[0.05,y1L_#+5]]);
+);
+Expr([[-4,5],"s1","-4",[4,5],"s1","4"]);
+x1L=-5..5;
+x1L=x1L--[0];
+forall(1..length(x1L),
+  Listplot("tx1"+text(#),[[x1L_#,5-0.05],[x1L_#,5+0.05]]);
+);
+
+//////////// 関数y=f(x)の出題 //////////
+Letter([7,10],"ne","次の関数のグラフの概形をかけ．",["Size=1"]);
+if(qflg==0,qf="x^3";);
+if(qflg==1,qf="x^3+3x^2";);
+if(qflg==2,qf="x^3-3x+1";);
+if(qflg==3,qf="3x^4-8x^3+6x^2";);
+qftex=Totexform(qf);
+Expr([6,9.25],"e","y="+qftex,["Size=1"]);
+qfcdy=Tocindyform(qf);
+Deffun("f(x)",["regional(y)","y="+qfcdy+"+5","y"]);
+
+
+////////////// 下段グラフ用紙の設定 ////////////
+Listplot("x2",[[XMIN,-5],[XMAX,-5]],["dr,0.75"]);
+Expr([XMAX,-5],"e","x");
+Listplot("y2",[[0,YMIN],[0,-1]],["dr,0.75"]);
+Expr([0,-1],"n","y'");
+Letter([0,-5],"sw","O");
+Expr([[0,-9],"w1","-4",[0,-1],"w1","4"]);
+y2L=-4..4;
+y2L=y2L--[0];
+forall(1..length(y2L),
+  Listplot("ty2"+text(#),[[-0.05,y2L_#-5],[0.05,y2L_#-5]]);
+);
+Expr([[-4,-5],"s1","-4",[4,-5],"s1","4"]);
+x2L=-5..5;
+x2L=x2L--[0];
+forall(1..length(x2L),
+  Listplot("tx2"+text(#),[[x2L_#,-5-0.05],[x2L_#,-5+0.05]]);
+);
+
+//////////// y=f'(x)のグラフ ///////////
+Expr([5.5,7],"e","y'=",["Size=1"]);
+if(length(Rstr)>0,
+  expr=Rtexstr;
+  Expr([5.5,8],"e","y'="+expr,["Size=1"]);
+  Deffun("g(x)",["regional(y)","y="+Rcdystr+"-5","y"]);
+  Plotdata("1","g(x)","x",["Num=100","nodisp"]);
+  gL=[];
+  forall(1..length(gr1),
+    yf=(gr1_#)_2;
+    if((yf>YMIN-1)&(yf<YMIN+9),
+      gL=append(gL,gr1_#);
+    );
+  );
+  Listplot("1",gL);
+  Putoncurve("P","gr1");
+  P.x=X.x; P.y=g(X.x);
+  Expr(X.xy,"s3","f'="+format(g(X.x)+5,1),["Size=1.5","Color=blue"]);
+);
+
+/////////////// y=f(x)のグラフ //////////////
+dL=-5..5;
+forall(1..length(dL),
+  Listplot("do"+text(#),[[dL_#,1],[dL_#,9]],["do"]);
+);
+Putpoint("Q1",Q1.xy,Q1.xy);
+Expr(Q1,"n3","1",["Size=1"]);
+Putpoint("Q2",Q2.xy,Q2.xy);
+Expr(Q2,"n3","2",["Size=1"]);
+Putpoint("Q3",Q3.xy,Q3.xy);
+Expr(Q3,"n3","3",["Size=1"]);
+Putpoint("Q4",Q4.xy,Q4.xy);
+Expr(Q4,"n3","4",["Size=1"]);
+Putpoint("Q5",Q5.xy,Q5.xy);
+Expr(Q5,"n3","5",["Size=1"]);
+
+/////////// 番号ボタンで線を引く ////////
+qL=1..5;
+qL=apply(qL,parse("Q"+text(#)));
+if(wflg==1,
+  Plotdata("2","f(x)","x",["Num=100","nodisp"]);
+  fL=[];
+  forall(1..length(gr2),
+    yf=(gr2_#)_2;
+    if((yf<YMAX+1)&(yf>YMAX-9),
+      fL=append(fL,gr2_#);
+    );
+  );
+  Listplot("2",fL);
+  Putoncurve("Q","gr2");
+  Q.x=X.x; Q.y=f(X.x);
+  dc=g(X.x)+5;
+  fn=Assign("mm*(x-x0)+f(x0)",["mm",dc,"x0",P.x]);
+  xrng=Assign("x=[aa,bb]",["aa",P.x-0.5,"bb",P.x+0.5]);
+  Plotdata("3",fn,xrng,["Color=blue"]);
+  if(Q.y<YMAX,
+    Expr(Q.xy,"n3","f'="+format(dc,1),["Size=1.5","Color=blue"]);
+  ,
+    if(Q.y<YMAX-8,
+      Expr([Q.x,YMAX-8],"s1","f'="+format(dc,1),["Size=1.5","Color=blue"]);
+    ,
+      Expr([Q.x,YMAX],"n1","f'="+format(dc,1),["Size=1.5","Color=blue"]);
+    );
+  );
+);
+
+//////////// 作業方法の説明 ////////
+Letter([5.5,-0.5],"e","(1) 「問題」ボタンを押して関数を決定し，",["Size=1"]);
+Letter([5.5,-1.5],"e","　 導関数$y'$を入力する．",["Size=1"]);
+Letter([5.5,-2.5],"e","(2)　スライダーを動かして$y'$の値の正負を",["Size=1"]);
+Letter([5.5,-3.5],"e","　 確認する．",["Size=1"]);
+Letter([5.5,-4.5],"e","(3) $f'=0$となる点に注意しながら，Q1からQ5",["Size=1"]);
+Letter([5.5,-5.5],"e","　 の点を関数$y$のグラフ上の位置に動かす．",["Size=1"]);
+Letter([5.5,-6.5],"e","(4) 「線を引く」ボタンを押してグラフをかく．",["Size=1"]);
+Letter([5.5,-7.5],"e","(5) (2)の作業を再度確認する．",["Size=1"]);
+
+///////////　リセットボタン　////////
+if(rflg==1,
+  funflg=1;name="Allclear()";
+  wflg=0;
+  Putpoint(X,[-2,0],[-2,0]);
+  Putpoint(Q1,[-4,5],[-4,5]);
+  Putpoint(Q2,[-2,5],[-2,5]);
+  Putpoint(Q3,[0,5],[0,5]);
+  Putpoint(Q4,[2,5],[2,5]);
+  Putpoint(Q5,[4,5],[4,5]);
+  Putpoint(P,[0,-5],[0,-5]);
+  Putpoint(Q,[0,1],[0,1]);
+  rflg=0;
+);
+
+Windispg();

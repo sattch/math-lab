@@ -94,7 +94,7 @@ Text34.xy=Pxy+By+Bx*4;
 
 inspect(Text35,"button.script","funflg=1;name="+Dq+"7"+Dq+";");
 Text35.xy=Pxy+By*2;
-inspect(Text36,"button.script","funflg=1;name="+Dq+")8"+Dq+";");
+inspect(Text36,"button.script","funflg=1;name="+Dq+"8"+Dq+";");
 Text36.xy=Pxy+By*2+Bx;
 inspect(Text37,"button.script","funflg=1;name="+Dq+"9"+Dq+";");
 Text37.xy=Pxy+By*2+Bx*2;

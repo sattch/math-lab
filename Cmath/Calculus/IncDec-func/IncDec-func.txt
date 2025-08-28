@@ -215,7 +215,7 @@ if(qflg==1,qf="x^3+3x^2";);
 if(qflg==2,qf="x^3-3x+1";);
 if(qflg==3,qf="3x^4-8x^3+6x^2";);
 qftex=Totexform(qf);
-Expr([6,9.25],"e","y="+qftex,["Size=1"]);
+Letter([6,9.25],"e","("+text(qflg+1)+") $y="+qftex+"$",["Size=1"]);
 qfcdy=Tocindyform(qf);
 Deffun("f(x)",["regional(y)","y="+qfcdy+"+5","y"]);
 

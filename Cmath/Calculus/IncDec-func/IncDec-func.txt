@@ -210,10 +210,11 @@ forall(1..length(x1L),
 
 //////////// 関数y=f(x)の出題 //////////
 Letter([7,10],"ne","次の関数のグラフの概形をかけ．",["Size=1"]);
-if(qflg==0,qf="x^3";);
+if(qflg==0,qf="fr(1,2)x^3";);
 if(qflg==1,qf="x^3+3x^2";);
 if(qflg==2,qf="x^3-3x+1";);
-if(qflg==3,qf="3x^4-8x^3+6x^2";);
+if(qflg==3,qf="fr(1,8)x^4-fr(1,2)x^3";);
+if(qflg==4,qf="3x^4-8x^3+6x^2";);
 qftex=Totexform(qf);
 Letter([6,9.25],"e","("+text(qflg+1)+") $y="+qftex+"$",["Size=1"]);
 qfcdy=Tocindyform(qf);
@@ -274,6 +275,9 @@ Putpoint("Q4",Q4.xy,Q4.xy);
 Expr(Q4,"n3","4",["Size=1"]);
 Putpoint("Q5",Q5.xy,Q5.xy);
 Expr(Q5,"n3","5",["Size=1"]);
+if(wflg==0,
+  Listplot("3",[Q1,Q2,Q3,Q4,Q5],["dr,0.5"]);
+);
 
 /////////// 番号ボタンで線を引く ////////
 qL=1..5;
@@ -287,7 +291,7 @@ if(wflg==1,
       fL=append(fL,gr2_#);
     );
   );
-  Listplot("2",fL);
+  Listplot("2",fL,["dr,1.5","Color=red"]);
   Putoncurve("Q","gr2");
   Q.x=X.x; Q.y=f(X.x);
   dc=g(X.x)+5;

@@ -276,7 +276,7 @@ if(pflg==6,
   if(nn6==0,yf="\dfrac{1}{\sqrt{1-x^2}}";ayf="\sin^{-1}x";);
   if(nn6==1,yf="\dfrac{1}{\sqrt{4-x^2}}";ayf="\sin^{-1}\dfrac{x}{2}";);
   if(nn6==2,yf="\dfrac{1}{\sqrt{x^2+1}}";ayf="\log |x+\sqrt{x^2+1}}";);
-  if(nn6==3,yf="\dfrac{1}{\sqrt{x^2+4}}";ayf="\log |x+4\sqrt{x^2+4}|";);
+  if(nn6==3,yf="\dfrac{1}{\sqrt{x^2+4}}";ayf="\log |x+\sqrt{x^2+4}|";);
   if(nn6==4,yf="\dfrac{1}{1+x^2}";ayf="\tan^{-1}x";);
   if(nn6==5,yf="\dfrac{1}{4+x^2}";ayf="\dfrac{1}{2}\tan^{-1}\dfrac{x}{2}";);
   Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);

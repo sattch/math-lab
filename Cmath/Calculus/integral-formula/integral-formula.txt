@@ -1,0 +1,305 @@
+///////////////////////// ketnamelib.txt /////////////////////////
+Str="";
+StrL=[];
+Strnow="";
+Strt="";
+Strc="";
+Strnq="";
+Texstr="";
+Nfun=1;
+npos=2;
+dispflg=0;
+tpos=[11,9.8];
+dpos=[0,-1];
+ch=2;
+
+//     ["BS","CL","<",">",">>"],
+
+Keyname():=(
+  regional(nL);
+  nL=[
+    ["fr","sq","^","sin","cos"],
+    ["log","asin","atan","|","tan"],
+    ["7","8","9","(",")",],
+    ["4","5","6","+","-"],
+    ["1","2","3","*","/"],
+    ["0","$\pi$","$e$","x",","]
+  ];
+  nL;
+);
+
+///////////////////////// initialize/KETlib /////////////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+setdirectory(Dircdy);
+import("ketcindylibkey.cs");
+import("keynamelib.txt");
+//import("ucreate.txt");
+
+funflg=0;
+//create(["Text10"],"EditableText",[[5,5,1]]);
+Seteditable(10,["","Size=18","Width=200"]);
+Text10.xy=[-6.5+2,4.3];//関数式の入力窓
+
+Text11.xy=[-8.5,9];//「出題」ボタン
+Text12.xy=[-8.5,0];//「リセット」ボタン
+Text13.xy=[-8.5,3];//「正解」ボタン
+
+pflg=0;
+reflg=0;
+rdflg=0;
+
+ky="";
+aflg=0;
+
+fnflg=0;
+detflg=0;
+stage=0;
+Str="";
+Strnow="";
+M1strnq="";
+M2strnq="";
+
+drwt(line,str):=(
+  drawtext([-5,poy],text(line)+" "+str,size->15);
+  poy=poy-0.8;
+);
+
+ky="";
+flg=-1;
+
+forall(20..24,
+//  Ucreate("Text"+text(#));
+);
+forall(30..59,
+//  Ucreate("Text"+text(#));
+);
+
+Pxy=[1.1+2,5.33];
+Bx=[1.28,0];
+By=[0,-0.91];
+
+inspect(Text20,"button.script","funflg=1;name="+Dq+"Delete()"+Dq+";");
+Text20.xy=Pxy;
+inspect(Text21,"button.script","funflg=1;name="+Dq+"Allclear()"+Dq+";");
+Text21.xy=Pxy+Bx;
+inspect(Text22,"button.script","funflg=1;name="+Dq+"Left()"+Dq+";");
+Text22.xy=Pxy+Bx*2;
+inspect(Text23,"button.script","funflg=1;name="+Dq+"Right()"+Dq+";");
+Text23.xy=Pxy+Bx*3;
+inspect(Text23,"button.script","funflg=1;name="+Dq+"RRight()"+Dq+";");
+Text24.xy=Pxy+Bx*4;
+
+inspect(Text30,"button.script","funflg=1;name="+Dq+"fr(,)"+Dq+";");
+Text30.xy=Pxy+By;
+inspect(Text31,"button.script","funflg=1;name="+Dq+"sq()"+Dq+";");
+Text31.xy=Pxy+By+Bx;
+inspect(Text32,"button.script","funflg=1;name="+Dq+"^()"+Dq+";");
+Text32.xy=Pxy+By+Bx*2;
+inspect(Text33,"button.script","funflg=1;name="+Dq+"sin()"+Dq+";");
+Text33.xy=Pxy+By+Bx*3;
+inspect(Text34,"button.script","funflg=1;name="+Dq+"cos()"+Dq+";");
+Text34.xy=Pxy+By+Bx*4;
+
+inspect(Text35,"button.script","funflg=1;name="+Dq+"\log||"+Dq+";");
+Text35.xy=Pxy+By*2;
+inspect(Text36,"button.script","funflg=1;name="+Dq+"\sin^{-1}()"+Dq+";");
+Text36.xy=Pxy+By*2+Bx;
+inspect(Text37,"button.script","funflg=1;name="+Dq+"\tan^{-1}()"+Dq+";");
+Text37.xy=Pxy+By*2+Bx*2;
+inspect(Text38,"button.script","funflg=1;name="+Dq+"|"+Dq+";");
+Text38.xy=Pxy+By*2+Bx*3;
+inspect(Text39,"button.script","funflg=1;name="+Dq+"tan()"+Dq+";");
+Text39.xy=Pxy+By*2+Bx*4;
+
+inspect(Text40,"button.script","funflg=1;name="+Dq+"7"+Dq+";");
+Text40.xy=Pxy+By*3;
+inspect(Text41,"button.script","funflg=1;name="+Dq+"8"+Dq+";");
+Text41.xy=Pxy+By*3+Bx;
+inspect(Text42,"button.script","funflg=1;name="+Dq+"9"+Dq+";");
+Text42.xy=Pxy+By*3+Bx*2;
+inspect(Text43,"button.script","funflg=1;name="+Dq+"("+Dq+";");
+Text43.xy=Pxy+By*3+Bx*3;
+inspect(Text44,"button.script","funflg=1;name="+Dq+")"+Dq+";");
+Text44.xy=Pxy+By*3+Bx*4;
+
+inspect(Text45,"button.script","funflg=1;name="+Dq+"4"+Dq+";");
+Text45.xy=Pxy+By*4;
+inspect(Text46,"button.script","funflg=1;name="+Dq+"5"+Dq+";");
+Text46.xy=Pxy+By*4+Bx;
+inspect(Text47,"button.script","funflg=1;name="+Dq+"6"+Dq+";");
+Text47.xy=Pxy+By*4+Bx*2;
+inspect(Text48,"button.script","funflg=1;name="+Dq+"+"+Dq+";");
+Text48.xy=Pxy+By*4+Bx*3;
+inspect(Text49,"button.script","funflg=1;name="+Dq+"-"+Dq+";");
+Text49.xy=Pxy+By*4+Bx*4;
+
+inspect(Text50,"button.script","funflg=1;name="+Dq+"1"+Dq+";");
+Text50.xy=Pxy+By*5;
+inspect(Text51,"button.script","funflg=1;name="+Dq+"2"+Dq+";");
+Text51.xy=Pxy+By*5+Bx;
+inspect(Text52,"button.script","funflg=1;name="+Dq+"3"+Dq+";");
+Text52.xy=Pxy+By*5+Bx*2;
+inspect(Text53,"button.script","funflg=1;name="+Dq+"*"+Dq+";");
+Text53.xy=Pxy+By*5+Bx*3;
+inspect(Text54,"button.script","funflg=1;name="+Dq+"/"+Dq+";");
+Text54.xy=Pxy+By*5+Bx*4;
+
+inspect(Text55,"button.script","funflg=1;name="+Dq+"0"+Dq+";");
+Text55.xy=Pxy+By*6;
+inspect(Text56,"button.script","funflg=1;name="+Dq+"pi"+Dq+";");
+Text56.xy=Pxy+By*6+Bx;
+inspect(Text57,"button.script","funflg=1;name="+Dq+"e"+Dq+";");
+Text57.xy=Pxy+By*6+Bx*2;
+inspect(Text58,"button.script","funflg=1;name="+Dq+"x"+Dq+";");
+Text58.xy=Pxy+By*6+Bx*3;
+inspect(Text59,"button.script","funflg=1;name="+Dq+","+Dq+";");
+Text59.xy=Pxy+By*6+Bx*4;
+
+///////////////////////// Draw/figures //////////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1.2"]);
+//Setwindow([-5,5],[-9,9]);
+Addax(0);
+
+/////////////// キーボード入力 //////////////
+nameL1=[["BS","AC","<",">",">>"]];
+Keytable(5,12.7,1,9,[1+2,5.1],[0,1,0],nameL1,[0,-0.2],20);
+nameL2=Keyname();
+Keytable(5,12.7,6,9,[1+2,0.58-0.91],[1,1,0],nameL2,[0,-0.2],20);
+
+if(funflg==1,
+  if(contains(Manifun,name),
+    parse(name+";");
+  ,
+    tmp=indexof(Str,"?");
+    if(tmp>0,npos=tmp,npos=length(Str));
+    out=Addfunstr(name,npos,Str);
+    tmp=length(out_1)-length(Str);
+    npos=npos+tmp;
+    Str=out_1; //npos=out_2;
+    if(npos<length(Str),
+      tmp=replace(Str,"?","");
+      tmp1=substring(tmp,0,npos-1)+"?";
+      Str=tmp1+substring(tmp,npos-1,length(tmp));
+    );
+  );
+  Subsedit(10,Str);
+  funflg=0;
+  stflg=0;
+);
+
+Str=Textedit(10,"","");
+Str=replace(Str,"frfr","tfr");
+Strnq=replace(Str,"?","");
+if(Strnq!=Strnow,
+  Strnow=Strnq;
+);
+
+Rstr=Strnq;
+Rtexstr=Totexform(Rstr);
+Rcdystr=Tocindyform(Rstr);
+
+Expr([-8,4.5],"e","\int f(x)dx=",["Size=1.5"]);
+if(length(Rstr)>0,
+  Expr([-8,6],"e","\int f(x)dx="+Rtexstr,["Size=1.5"]);
+);
+
+//////////// 問題・正解表示 /////////
+Letter([-7,9],"e","次の関数を積分せよ．",["Size=1.5"]);
+if(rdflg==1,
+  nn=random();
+  nn=floor(nn*1000);
+  nn3=mod(nn,3);
+  nn4=mod(nn,4);
+  nn6=mod(nn,6);
+  nn8=mod(nn,8);
+  rdflg=0;
+);
+if(pflg==1,
+  if(nn8==0,yf="2";ayf="2x";);
+  if(nn8==1,yf="x";ayf="\dfrac{1}{2}x^2";);
+  if(nn8==2,yf="x^2";ayf="\dfrac{1}{3}x^3";);
+  if(nn8==3,yf="x^3";ayf="\dfrac{1}{4}x^4";);
+  if(nn8==4,yf="x^4";ayf="\dfrac{1}{5}x^5";);
+  if(nn8==5,yf="x^5";ayf="\dfrac{1}{6}x^6";);
+  if(nn8==6,yf="x^6";ayf="\dfrac{1}{7}x^7";);
+  if(nn8==7,yf="x^7";ayf="\dfrac{1}{8}x^8";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+if(pflg==2,
+  if(nn3==0,yf="\dfrac{1}{x}";ayf="\log |x|";);
+  if(nn3==1,yf="\dfrac{1}{x^2}";ayf="-\dfrac{1}{x}";);
+  if(nn3==2,yf="\dfrac{1}{x^3}";ayf="-\dfrac{1}{2x^2}";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+if(pflg==3,
+  if(nn6==0,yf="\sqrt{x}";ayf="\dfrac{2}{3}\sqrt{x^3}";);
+  if(nn6==1,yf="\sqrt[3]{x}";ayf="\dfrac{3}{4}\sqrt[3]{x^4}";);
+  if(nn6==2,yf="\sqrt[4]{x}";ayf="\dfrac{4}{5}\sqrt[4]{x^5}";);
+  if(nn6==3,yf="\dfrac{1}{\sqrt{x}}";ayf="\dfrac{1}{2}\sqrt{x}";);
+  if(nn6==4,yf="\dfrac{1}{\sqrt[3]{x}}";ayf="\dfrac{2}{3}\sqrt[3]{x^2}";);
+  if(nn6==5,yf="\dfrac{1}{\sqrt[4]{x}}";ayf="\dfrac{3}{4}\sqrt[4]{x^3}";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+if(pflg==4,
+  if(nn3==0,yf="\sin x";ayf="-\cos x";);
+  if(nn3==1,yf="\cos x";ayf="\sin x";);
+  if(nn3==2,yf="\tan x";ayf="-\log|\cos x|";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+if(pflg==5,
+  if(nn3==0,yf="e^x";ayf="e^x";);
+  if(nn3==1,yf="e^{2x}";ayf="\dfrac{1}{2}e^{2x}";);
+  if(nn3==2,yf="e^{3x}";ayf="\dfrac{1}{3}e^{3x}";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+if(pflg==6,
+  if(nn6==0,yf="\dfrac{1}{\sqrt{1-x^2}}";ayf="\sin^{-1}x";);
+  if(nn6==1,yf="\dfrac{1}{\sqrt{4-x^2}}";ayf="\sin^{-1}\dfrac{x}{2}";);
+  if(nn6==2,yf="\dfrac{1}{\sqrt{x^2+1}}";ayf="\log |x+\sqrt{x^2+1}}";);
+  if(nn6==3,yf="\dfrac{1}{\sqrt{x^2+4}}";ayf="\log |x+4\sqrt{x^2+4}|";);
+  if(nn6==4,yf="\dfrac{1}{1+x^2}";ayf="\tan^{-1}x";);
+  if(nn6==5,yf="\dfrac{1}{4+x^2}";ayf="\dfrac{1}{2}\tan^{-1}\dfrac{x}{2}";);
+  Expr([-8,7.5],"e","("+text(pflg)+")\ f(x)="+yf,["Size=1.5"]);
+  if(aflg==1,
+    Expr([-8,1.75],"e","\int f(x)dx="+ayf,["Size=1.5","Color=red"]);
+  );
+);
+
+//////////// 作業方法の説明 ////////
+Letter([-8,-1],"e","(1) 「出題」ボタンを押して関数$y=$を表示する．",["Size=1"]);
+Letter([-8,-2],"e","(2) $y'=$を入力する．",["Size=1"]);
+Letter([-8,-3],"e","(3) 「正解」ボタンを押して答え合わせする．",["Size=1"]);
+Letter([-8,-4],"e","(4) 「出題」ボタンを押して繰り返し行う．",["Size=1"]);
+Letter([-8,-5],"e","(5) 「リセット」ボタンを押して最初からやり直す．",["Size=1"]);
+
+///////////　リセットボタン　////////
+if(reflg==1,
+  funflg=1;name="Allclear()";
+  wflg=0;
+  pflg=0;
+  aflg=0;
+  reflg=0;
+  rdflg=0;
+);
+
+Windispg();

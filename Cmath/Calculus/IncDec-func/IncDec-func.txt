@@ -277,6 +277,10 @@ Putpoint("Q5",Q5.xy,Q5.xy);
 Expr(Q5,"n3","5",["Size=1"]);
 if(wflg==0,
   Listplot("3",[Q1,Q2,Q3,Q4,Q5],["dr,0.5"]);
+  Arrowhead("1",(Q1+Q2)/2,"sg3",[1.5]);
+  Arrowhead("2",(Q2+Q3)/2,"sg3",[1.5]);
+  Arrowhead("3",(Q3+Q4)/2,"sg3",[1.5]);
+  Arrowhead("4",(Q4+Q5)/2,"sg3",[1.5]);
 );
 
 /////////// 番号ボタンで線を引く ////////

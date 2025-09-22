@@ -1,0 +1,253 @@
+///////////////////////// initialize/KETlib /////////////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+setdirectory(Dircdy);
+
+funflg=0;
+
+Text10.xy=[7,-7.5-1.7];//「リセット」ボタン
+
+wflg=0;
+rflg=0;
+
+
+ky="";
+ansflg=0;
+bflg=0;// bbボタンの設定
+fnflg=0;
+detflg=0;
+stage=0;
+Str="";
+Strnow="";
+M1strnq="";
+M2strnq="";
+
+drwt(line,str):=(
+  drawtext([-5,poy],text(line)+" "+str,size->15);
+  poy=poy-0.8;
+);
+
+ky="";
+flg=-1;
+
+///////////////////////// Draw/figures //////////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1.2"]);
+Setwindow([-5,5],[-5,5]);
+
+/////////////// スライダーの設定 /////////////
+Slider("A",[XMIN,-6],[XMAX,-6]);
+inspect(A,"ptsize","5.1");
+aa=parse(format(A.x,1));
+Expr(A.xy,"n3","a="+text(aa),["Size=1.5"]);
+
+Slider("B",[XMIN,-7],[XMAX,-7]);
+inspect(B,"ptsize","5.1");
+bb=parse(format(B.x,1));
+Expr(B.xy,"n3","b="+text(bb),["Size=1.5"]);
+
+////////////// グラフ用紙の設定 ///////////
+xL=-5..5;
+xL=xL--[0];
+forall(1..length(xL),
+  Listplot("dox"+text(#),[[XMIN,xL_#],[XMAX,xL_#]],["do"]);
+);
+yL=-5..5;
+yL=yL--[0];
+forall(1..length(yL),
+  Listplot("doy"+text(#),[[yL_#,YMIN],[yL_#,YMAX]],["do"]);
+);
+
+//////////// 関数y=f(x)の出題 //////////
+qf="fr(1,2)x^3";
+iqf="fr(1,8)x^4";
+qftex=Totexform(qf);
+Letter([6,10-4.5],"e","問題",["Size=1.5"]);
+Framedata("1",[6.6,5.55],0.7,0.45);
+Letter([7.7,10-4.5],"e","関数 $f(x)="+qftex+"$ について，",["Size=1"]);
+Letter([6,8.75-4.5],"ne","次の定積分の値を確認せよ．",["Size=1"]);
+
+qfcdy=Tocindyform(qf);
+Deffun("f(x)",["regional(y)","y="+qfcdy,"y"]);
+iqfcdy=Tocindyform(iqf);
+Deffun("s(x)",["regional(y)","y="+iqfcdy,"y"]);
+
+//////////// y=f(x)のグラフ ///////////
+Plotdata("1","f(x)","x",["Num=100","nodisp"]);
+  if(aa==0,
+    if(bb==0,
+      Plotdata("1","f(x)","x",["Num=100"]);
+      ans=0;
+      aria=0;
+    );
+    if(bb>0,
+      Listplot("1",[[0,0],[bb,0]],["nodisp"]);
+      Listplot("2",[[bb,0],[bb,f(bb)]],["nodisp"]);
+      Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+      Shade(["en1"],["Color=[1,0,1,0.5]"]);
+      Plotdata("1","f(x)","x",["Num=100"]);
+      Listplot("1",[[0,0],[bb,0]]);
+      Listplot("2",[[bb,0],[bb,f(bb)]]);
+      ans=s(bb)-s(aa);
+      aria=ans;
+    );
+    if(bb<0,
+      Listplot("1",[[bb,f(bb)],[bb,0]],["nodisp"]);
+      Listplot("2",[[bb,0],[0,0]],["nodisp"]);
+      Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+      Shade(["en1"],["Color=[1,0,1,0.5]"]);
+      Plotdata("1","f(x)","x",["Num=100"]);
+      Listplot("1",[[bb,f(bb)],[bb,0]]);
+      Listplot("2",[[bb,0],[0,0]]);
+      ans=-(s(bb)-s(aa));
+      aria=-ans;
+    );
+  );
+  if(aa>0,
+    if(bb==aa,
+      Plotdata("1","f(x)","x",["Num=100"]);
+      ans=0;
+      aria=0;
+    );
+    if(bb>aa,
+      Listplot("1",[[aa,f(aa)],[aa,0],[bb,0]],["nodisp"]);
+      Listplot("2",[[bb,0],[bb,f(bb)]],["nodisp"]);
+      Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+      Shade(["en1"],["Color=[1,0,1,0.5]"]);
+      Plotdata("1","f(x)","x",["Num=100"]);
+      Listplot("1",[[aa,f(aa)],[aa,0],[bb,0]]);
+      Listplot("2",[[bb,0],[bb,f(bb)]]);
+      ans=s(bb)-s(aa);
+      aria=ans;
+    );
+    if(bb<aa,
+      if(bb>0,
+        Listplot("1",[[bb,f(bb)],[bb,0],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[aa,f(aa)]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[bb,f(bb)],[bb,0],[aa,0]]);
+        Listplot("2",[[aa,0],[aa,f(aa)]]);
+        ans=-(s(bb)-s(aa));
+        aria=-ans;
+      );
+      if(bb==0,
+        Listplot("1",[[bb,0],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[aa,f(aa)]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[bb,0],[aa,0]]);
+        Listplot("2",[[aa,0],[aa,f(aa)]]);
+        ans=s(bb)-s(aa);
+        aria=-ans;
+      );
+      if(bb<0,
+        Listplot("1",[[0,0],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[aa,f(aa)]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Listplot("3",[[bb,f(bb)],[bb,0]],["nodisp"]);
+        Listplot("4",[[bb,0],[0,0]],["nodisp"]);
+        Enclosing("2",["sg3","sg4","Invert(gr1)"],[]);
+        Shade(["en2"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[0,0],[aa,0]]);
+        Listplot("2",[[aa,0],[aa,f(aa)]]);
+        Listplot("3",[[bb,f(bb)],[bb,0]]);
+        Listplot("4",[[bb,0],[0,0]]);
+        ans=-(s(bb)-s(aa));
+        aria=-(s(0)-s(bb))+(s(aa)-s(0));
+      );
+    );
+  );
+  if(aa<0,
+    if(bb==aa,
+      Plotdata("1","f(x)","x",["Num=100"]);
+      ans=0;
+      aria=0;
+    );
+    if(bb<aa,
+      if(bb<0,
+        Listplot("1",[[bb,f(bb)],[bb,0],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[aa,f(aa)]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[bb,f(bb)],[bb,0],[aa,0]]);
+        Listplot("2",[[aa,0],[aa,f(aa)]]);
+        ans=s(aa)-s(bb);
+        aria=-ans;
+      );
+    );
+    if(bb>aa,
+      if(bb<0,
+        Listplot("1",[[aa,f(aa)],[aa,0],[bb,0]],["nodisp"]);
+        Listplot("2",[[bb,0],[bb,f(bb)]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[aa,f(aa)],[aa,0],[bb,0]]);
+        Listplot("2",[[bb,0],[bb,f(bb)]]);
+        ans=s(bb)-s(aa);
+        aria=-ans;
+      );
+      if(bb==0,
+        Listplot("1",[[aa,f(aa)],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[0,0]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[aa,f(aa)],[aa,0]]);
+        Listplot("2",[[aa,0],[0,0]]);
+        ans=s(0)-s(aa);
+        aria=-ans;
+      );
+      if(bb>0,
+        Listplot("1",[[aa,f(aa)],[aa,0]],["nodisp"]);
+        Listplot("2",[[aa,0],[0,0]],["nodisp"]);
+        Enclosing("1",["sg1","sg2","Invert(gr1)"],[]);
+        Shade(["en1"],["Color=[1,0,1,0.5]"]);
+        Listplot("3",[[0,0],[bb,0]],["nodisp"]);
+        Listplot("4",[[bb,0],[bb,f(bb)]],["nodisp"]);
+        Enclosing("2",["sg3","sg4","Invert(gr1)"],[]);
+        Shade(["en2"],["Color=[1,0,1,0.5]"]);
+        Plotdata("1","f(x)","x",["Num=100"]);
+        Listplot("1",[[aa,f(aa)],[aa,0]]);
+        Listplot("2",[[aa,0],[0,0]]);
+        Listplot("3",[[0,0],[bb,0]]);
+        Listplot("4",[[bb,0],[bb,f(bb)]]);
+        ans=s(bb)-s(aa);
+        aria=-(s(0)-s(aa))+(s(bb)-s(0));
+      );
+    );
+  );
+
+  Letter([6.5,7-4],"ne","定積分$\int_{"+text(aa)+"}^{"+text(bb)+"}f(x)dx="+text(ans)+"$",["Size=1.5"]);
+  Letter([6.5,5.5-4],"ne","領域の面積$="+text(aria)+"$",["Size=1.5"]);
+
+//////////// 作業方法の説明 ////////
+Letter([5.5,0],"e","(1) 上のスライダーを動かして，$a$の値を",["Size=1"]);
+Letter([5.5,-1],"e","    定める．",["Size=1"]);
+Letter([5.5,-2],"e","(2) 下のスライダーを動かして，$b$の値を",["Size=1"]);
+Letter([5.5,-3],"e","    変更し，定積分の値と領域の面積が",["Size=1"]);
+Letter([5.5,-4],"e","    一致するかどうか確認する．",["Size=1"]);
+Letter([5.5,-5],"e","(3) 上のスライダーを動かして，$a$の値を",["Size=1"]);
+Letter([5.5,-6],"e","    変更し，(2)の作業を繰り返す．また，",["Size=1"]);
+Letter([5.5,-7],"e","    修正する場合は，リセットボタンを",["Size=1"]);
+Letter([5.5,-8],"e","    押してやり直す．",["Size=1"]);
+
+///////////　リセットボタン　////////
+if(rflg==1,
+  funflg=1;name="Allclear()";
+  wflg=0;
+  Putpoint(A,[0,-6],[0,-6]);
+  Putpoint(B,[0,-7],[0,-7]);
+  rflg=0;
+);
+
+Windispg();

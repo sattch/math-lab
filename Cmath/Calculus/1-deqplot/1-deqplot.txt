@@ -1,0 +1,43 @@
+///////////////////// Draw/figures /////////////////
+Ketinit();
+
+Setketcindyjs(["Sc=1.2","Color=offwhite"]);
+Setwindow([-0.5,10],[-0.5,10]);
+Setscaling(0.1);
+Setax(["","t","","x","","",""]);
+
+///////////// 解曲線 ///////////////
+Setscaling(1);
+Slider("C",[0,-0.5],[0,10]);
+inspect(C,"ptsize","5.1");
+Expr(C.xy,"e2","C="+format(C.y*10,2));
+Slider("K",[0,-1],[10,-1],["Size=5"]);
+inspect(K,"ptsize","5.1");
+Expr(K.xy,"s2","k="+format(K.x/5,2));
+
+eq1="y'=-K.x*(y-1.5)";
+eq1=Assign(eq1,["K.x",format(K.x/5,2)]);
+
+Deqplot("1",eq1,"x=[0,XMAX]",0,C.y,["Num=200"]); 
+Listplot("da1",[[0,1.5],[XMAX,1.5]],["da"]);
+
+Htickmark([5,"5",10,"10"]);
+Vtickmark([1.5,"15",5,"50",8,"80",10,"100"]);
+
+////////////// 微分方程式の表示 /////////////
+Letter([5,12],"c","ニュートンの冷却法則",["Size=1.5"]);
+Expreq(eq):=(
+  regional(str);
+  str=eq;
+  str=Assign(str,["K.x",format(K.x/5,2)]);
+  str=replace(str,"y'","\frac{dx}{dt}");
+  str=replace(str,"y","x");
+  str=replace(str,"*","");
+  str="\displaystyle "+str;
+  str;
+);
+eq2="y'=-K.x*(y-15)";
+str=Expreq(eq2);
+Expr([[3,11],"e",str],["size->20"]);
+
+Windispg();

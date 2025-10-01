@@ -4401,7 +4401,7 @@ if(pflg==6,
   if(nn6==0,yf="\sin^{-1}x";ayf="\dfrac{1}{\sqrt{1-x^2}}";);
   if(nn6==1,yf="\sin^{-1}\dfrac{x}{2}";ayf="\dfrac{1}{\sqrt{4-x^2}}";);
   if(nn6==2,yf="\cos^{-1}x";ayf="-\dfrac{1}{\sqrt{1-x^2}}";);
-  if(nn6==3,yf="\cos^{-1}\dfrac{x}{3}";ayf="-\dfrac{1}{\sqrt{4-x^2}}";);
+  if(nn6==3,yf="\cos^{-1}\dfrac{x}{3}";ayf="-\dfrac{1}{\sqrt{9-x^2}}";);
   if(nn6==4,yf="\tan^{-1}x";ayf="\dfrac{1}{1+x^2}";);
   if(nn6==5,yf="\tan^{-1}\dfrac{x}{2}";ayf="\dfrac{2}{4+x^2}";);
   Expr([-8,7.5],"e","("+text(pflg)+")\ y="+yf,["Size=1.5"]);
@@ -4504,14 +4504,14 @@ var cdy = CindyJS({
   ],
   ports: [{
     width: 641,
-    height: 557,
+    height: 536,
     id: "CSCanvas",
-    transform: [{visibleRect: [-8.94002076325762, 9.9607966146793, 8.643666483812616, -5.317912903374237]}],
+    transform: [{visibleRect: [-8.94002076325762, 9.9607966146793, 8.643666483812616, -4.758132597755897]}],
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
   use: ["katex"],
-  cinderella: {build: 2091, version: [3, 0, 2091]}
+  cinderella: {build: 2088, version: [3, 0, 2088]}
 });
     </script>
 </head>

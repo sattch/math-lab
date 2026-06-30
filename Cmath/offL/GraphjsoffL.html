@@ -9,7 +9,7 @@
             margin: 0px;
             padding: 0px;
         }
-
+        
         #CSConsole {
             background-color: #FAFAFA;
             border-top: 1px solid #333333;
@@ -2065,9 +2065,9 @@ tmp1=Textedit(n0); //
   if(length(tmp2)==0,out=str,out=tmp2);
   out;
 ); //210208to
-Totexform(str):=( //210803from[renew]
-  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,post,ctr,clv,nn,
-      tmp,tmp1,tmp2,tmp3,tmp4);
+Totexform(str):=( //231215
+  regional(plv,funL,repL,parL,out,head,flg,rep,fun,pre,
+    post,ctr,clv,nn,tmp,tmp1,tmp2,tmp3,tmp4);
   tmp1="\displaystyle\int"; //210831from
   tmp2="\displaystyle\lim";
   tmp3="\displaystyle\sum"; //210831to
@@ -2076,7 +2076,7 @@ Totexform(str):=( //210803from[renew]
     ["_(",["_{xx}"]], //210831
     ["tx(",["\text{xx}"]], //210907
     ["tfr(",["","\frac{xx}{yy}"]], //210831,220523
-    ["fr(",["","\dfrac{xx}{yy}"]], //210228from
+    ["fr(",["","\displaystyle\frac{xx}{yy}"]], //210228from 231224
     ["log(",["\log xx ","\log_{xx} yy"]], //210405
     ["ln(",["\ln xx "]], //210903
     ["sq(",["\sqrt{xx}","\sqrt[xx]{yy}"]],
@@ -2085,7 +2085,7 @@ Totexform(str):=( //210803from[renew]
     ["cos(",["\cos xx ","\cos^{xx}\! yy "]], //210405
     ["tan(",["\tan xx ","\tan^{xx}\! yy "]],  //210228to  //210405
     ["lim(", ["",tmp2+"_{xx \to yy} ",tmp2+"_{xx \to yy} zz"]], //210831from
-    ["int(", [tmp1+" ",tmp1+" xx dyy ",tmp1+" yy dzz ",tmp1+"_{xx}^{yy} zz dww "]],  //211027
+    ["int(", [tmp1+" ",tmp1+" xx yy ",tmp1+" yy zz ",tmp1+"_{xx}^{yy} zz ww "]],  //211027
     ["sum(", ["",tmp3+"_{xx}^{yy} ", tmp3+"_{xx}^{yy} zz"]], //210831to
     ["diff(", ["d ","\frac{dxx}{dyy}"]], //210913
     ["par(", ["\partial ","\frac{\partial xx}{\partial yy}"]] ,//210913
@@ -2093,6 +2093,27 @@ Totexform(str):=( //210803from[renew]
   ];
   parL=["log(","sin(","cos(","tan(","lim(","int(","sum("]; //210901
   out=replace(str,"pi","{\pi}"); //210805
+  out=replace(out,"frac(","fr(");//231227
+  out=replace(out,"sqrt(","sq(");//231215 from
+  tmp=indexof(out,")/(");
+  ctr=1;
+  while((tmp>0)&(ctr<20),
+    tmp1=substring(out,0,tmp);
+    tmp2=substring(out,tmp+1,length(out));
+    tmp=Bracket(tmp1);
+    tmp3=tmp_(-1)_2;
+    tmp=select(tmp,#_2==-tmp3);
+    tmp=tmp_(-1)_1;
+    tmp1=substring(tmp1,0,tmp-1)+"fr("+
+           substring(tmp1,tmp,length(tmp1)-1)+",";
+    tmp=Bracket(tmp2);
+    tmp=select(tmp,#_2==-1);
+    tmp=tmp_1_1;
+    tmp2=substring(tmp2,1,length(tmp2));
+    out=tmp1+tmp2;
+    tmp=indexof(out,")/(");
+    ctr=ctr+1;
+  );//231215 to
   head="";
   flg=0;
   plv=Bracket(out,"()");
@@ -2137,6 +2158,11 @@ Totexform(str):=( //210803from[renew]
        if(nn==2,
           tmp1=substring(out,plv_1_1,clv_1_1-1);
           tmp2=substring(out,clv_1_1,length(out)-1);
+		  if(indexof(out,"int(")>0, //231227from
+		    if((length(tmp2)>0)&(substring(tmp2,0,1)!="d"),
+			  tmp2="d"+tmp2;
+            );
+          ); //231227to
           if(contains(parL,fun), //210901from
             tmp2=Addpar(tmp2); //211029
           ); //210901to
@@ -2162,6 +2188,11 @@ Totexform(str):=( //210803from[renew]
             tmp3=Addpar(tmp3); //211029
           ); //210901to
           tmp4=substring(out,clv_3_1,length(out)-1);
+		  if(indexof(out,"int(")>0, //231227from
+		    if((length(tmp4)>0)&(substring(tmp4,0,1)!="d"),
+			  tmp4="d"+tmp4;
+            );
+          );//231227to
           tmp=replace(rep_2_4,"xx",tmp1);
           tmp=replace(tmp,"yy",tmp2);
           tmp=replace(tmp,"zz",tmp3);
@@ -2954,7 +2985,7 @@ Arrowhead(nm,pointorg,directionorg,optionsorg):=(//191129remade
        options=remove(options,[#]);
      );
   );
-  list=Arrowheaddata(point,direction,options);
+   list=Arrowheaddata(point,direction,options);
   if(length(point)>1, //210724from
     if(!Inwindow(point),Noflg=2);
     if(isstring(direction),
@@ -2994,9 +3025,18 @@ Arrowhead(nm,pointorg,directionorg,optionsorg):=(//191129remade
 );
 Arrowheaddata(point,direction):=
    Arrowheaddata(point,direction,[YaSize,YaAngle,YaPosition,YaCut]);
-Arrowheaddata(point,direction,options):=( //191127remade
-  regional(scaley,Eps,size,angle,segpos,cut, Houkou,hflg,Str,Ev,Nv,
-       reL,pP,vec,pA,pB,pC,par,out,tmp,tmp1,tmp2);
+Arrowheaddata(pointorg,directionorg,options):=( //191127remade
+  regional(point,direction,scaley,Eps,size,angle,segpos,cut, 
+            Houkou,hflg,Str,Ev,Nv,reL,pP,vec,
+            pA,pB,pC,par,out,tmp,tmp1,tmp2);
+  point=Pcrd(pointorg); //230830from
+  tmp=directionorg;
+  if(isstring(tmp),
+    tmp=parse(tmp);
+    direction=apply(tmp,Pcrd(#)); //230830to 
+  ,
+    direction=Pcrd(tmp);
+  );
   Eps=10^(-4);
   tmp=Divoptions(options);
   reL=tmp_6;
@@ -4392,7 +4432,7 @@ Text28.xy=[8.71,-1.92]+Pxy;
 inspect(Text29,"button.script","funflg=1;name="+Dq+"9"+Dq+";");
 Text29.xy=[9.68,-1.92]+Pxy;
 inspect(Text30,"button.script","funflg=1;name="+Dq+"pi"+Dq+";");
-Text30.xy=[8.71,-2.07]+Pxy;
+Text30.xy=[8.71,-4.07]+Pxy;
 inspect(Text31,"button.script","funflg=1;name="+Dq+"x"+Dq+";");
 Text31.xy=[9.68,-4.07]+Pxy;
 inspect(Text32,"button.script","funflg=1;name="+Dq+"-"+Dq+";");
@@ -4577,20 +4617,20 @@ var cdy = CindyJS({
     {name: "Text54", type: "Button", pos: [4.0, 0.1761658031088083, 0.34542314335060453], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"RRight()\";", text: "\u0000\u0000\u0000\u0000　　", textsize: 18.0},
     {name: "Text50", type: "Button", pos: [4.0, 0.26493506493506497, 0.5194805194805195], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"Delete()\";", text: "\u0000\u0000　　", textsize: 18.0},
     {name: "Text31", type: "Button", pos: [4.0, -1.0500863557858378, 0.34542314335060453], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"x\";", text: "　　", textsize: 18.0},
-    {name: "Text30", type: "Button", pos: [4.0, -0.39208294062205457, 0.3770028275212064], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"pi\";", text: "　　", textsize: 18.0}
+    {name: "Text30", type: "Button", pos: [4.0, -1.1460885956644675, 0.3770028275212064], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 0.27272728085517883, script: "funflg=1;name=\"pi\";", text: "　　", textsize: 18.0}
   ],
   ports: [{
-    id: "CSCanvas",
     width: 1039,
-    height: 634,
-    transform: [{visibleRect: [-6.035385746332949, 6.318737189822759, 13.591424239394545, -5.65758382167987]}],
+    height: 617,
+    id: "CSCanvas",
+    transform: [{visibleRect: [-6.035385746332949, 6.318737189822759, 13.591424239394545, -5.3364521857247516]}],
     grid: 1.0,
     snap: true,
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
   use: ["katex"],
-  cinderella: {build: 2039, version: [3, 0, 2039]}
+  cinderella: {build: 2091, version: [3, 0, 2091]}
 });
     </script>
 </head>

@@ -226,6 +226,42 @@ Strictmove(pCorg,sep):=(
     );
   );
 );
+Deffun(name,bodylist):=(
+  regional(funstr,str,pos,nbody,bdy,ppL,bpL,excma,tmp,tmp1,tmp2);
+  funstr=name+":=(";
+  forall(bodylist,
+    tmp1=Removespace(#); //190816from
+    tmp1=tmp1+";";
+    funstr=funstr+tmp1; //190816to
+  );
+  funstr=funstr+");";
+  parse(funstr);
+);
+Removespace(str):=(
+  regional(tmp,flg,out);
+  tmp=length(str)+1;
+  flg=0;
+  forall(1..(length(str)),
+    if(flg==0,
+      if((str_#)!=" ",
+        tmp=#;
+        flg=1;
+      );
+    );
+  );
+  out=substring(str,tmp-1,length(str));
+  flg=0;
+  tmp=0;
+  forall(reverse(1..(length(out))),
+    if(flg==0,
+      if((out_#)!=" ",
+        tmp=#;
+        flg=1;
+      );
+    );
+  );
+  out=substring(out,0,tmp);
+);
 Textedit(no):=(
   regional(tmp,tmp1,tmp2);
   tmp="Text"+text(no)+".currenttext";
@@ -596,31 +632,6 @@ Colorrgb2cmyk(clr):=(
   );
   clrnew;
 );
-Removespace(str):=(
-  regional(tmp,flg,out);
-  tmp=length(str)+1;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      if((str_#)!=" ",
-        tmp=#;
-        flg=1;
-      );
-    );
-  );
-  out=substring(str,tmp-1,length(str));
-  flg=0;
-  tmp=0;
-  forall(reverse(1..(length(out))),
-    if(flg==0,
-      if((out_#)!=" ",
-        tmp=#;
-        flg=1;
-      );
-    );
-  );
-  out=substring(out,0,tmp);
-);
 Lcrd(pt):=(
   regional(tmp);
   if(ispoint(pt),
@@ -652,17 +663,6 @@ Lettermove(dir,str):=(
 Dqq(str):=DqDq(str); //18.02.11
 DqDq(str):=(
   unicode("0022")+str+unicode("0022");
-);
-Deffun(name,bodylist):=(
-  regional(funstr,str,pos,nbody,bdy,ppL,bpL,excma,tmp,tmp1,tmp2);
-  funstr=name+":=(";
-  forall(bodylist,
-    tmp1=Removespace(#); //190816from
-    tmp1=tmp1+";";
-    funstr=funstr+tmp1; //190816to
-  );
-  funstr=funstr+");";
-  parse(funstr);
 );
 Htickmark(arglist):=Htickmark("",arglist,[]);
 Htickmark(Arg1,Arg2):=(
@@ -1016,6 +1016,289 @@ fillpoly(parse("ar"+nm+"h"),color->tmp); //
   SCALEY=scaley; //200114
   [LLcrd(pA),LLcrd(pB)];
 );
+Integrate(Arg1,Arg2):=( //180708from
+  if(isstring(Arg2),
+    Integratefn(Arg1,Arg2,[]);
+  ,
+    Integratedt(Arg1,Arg2,[]);
+  );
+);
+Integrate(Arg1,Arg2,options):=(
+  if(isstring(Arg2),
+    Integratefn(Arg1,Arg2,options);
+  ,
+    Integratedt(Arg1,Arg2,options);
+  );
+);//180708to
+Integratefn(fnstr,rngstr,options):=( //180708from
+  regional(Sm,Lx,Rx,va1,va2,Num,Way,sx,ex,dx,xn,yn,
+     x0,x1,x2,y0,y1,y2,tmp,tmp1,tmp2,eqL,var,range,plt);
+  Num=100;
+  Way="o";
+  tmp=Divoptions(options);
+  eqL=tmp_5;
+  forall(eqL,
+    tmp=Strsplit(#,"=");
+    tmp1=Toupper(substring(tmp_1,0,1));
+    tmp2=tmp_2;
+    if(tmp1=="N",
+      Num=parse(tmp2);
+    );
+    if(tmp1=="R",
+      tmp2=substring(tmp2,0,1);
+    );
+  );
+  tmp=Strsplit(rngstr,"=");
+  var=tmp_1;
+  range=parse(tmp_2);
+  if(Way=="o",
+    sx=range_1;
+    ex=range_2;
+    dx=(ex-sx)/Num;
+    xn=apply(0..Num,sx+#*dx);
+    yn=apply(xn,parse(Assign(fnstr,[var,#]))); //181230
+    plt=apply(1..(Num+1),[xn_#,yn_#]);
+    Sm=IntegrateO(plt,range);
+  );//180708to
+  if(Way=="t",
+    Sm=0;
+    forall(1..Num,
+      Lx=range_1+(range_2-range_1)*(#-1)/Num;
+      Rx=range_1+(range_2-range_1)*#/Num;
+      va1=parse(replace(fnstr,vastr,Textformat(Lx,5)));
+      va2=parse(replace(fnstr,vastr,Textformat(Rx,5)));
+      Sm=Sm+(va1+va2)*(Rx-Lx)/2;
+    );
+  );
+  if(Way=="s",
+    Sm=0;
+    sx=range_1;
+    ex=range_2;
+    dx=(ex-sx)/Num;
+    xn=apply(0..Num,sx+#*dx);
+    yn=apply(xn,parse(replace(fnstr,vastr,Textformat(#,5))));
+    dx=dx/2;
+    repeat(Num,s,
+      x0=xn_s;
+      x1=(xn_s+xn_(s+1))/2;
+      x2=xn_(s+1);
+      y0=yn_s;
+      y1=parse(replace(fnstr,vastr,Textformat(x1,5)));
+      y2=yn_(s+1);
+      Sm=Sm+dx*(y0+4*y1+y2)/3;
+    ); 
+  );
+  SCALEY*Sm; //211125
+);
+IntegrateO(p0org,p1org,p2org,p3org):=(
+  regional(p0,p1,p2,p3,pQ,pR,cc,p01,p02,
+     p11,p12,p21,p22,p31,p32, tmp);
+  if(ispoint(p0org),p0=p0org.xy,p0=p0org);  // 16.03.10
+  if(ispoint(p1org),p1=p1org.xy,p1=p1org); // 16.03.16
+  if(ispoint(p2org),p2=p2org.xy,p2=p2org);
+  if(ispoint(p3org),p3=p3org.xy,p3=p3org);
+  tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
+  cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
+  pQ=p1+cc*(p2-p0);
+  pR=p2+cc*(p1-p3);
+  p01=p1_1; p02=p1_2;
+  p31=p2_1; p32=p2_2;
+  p11=pQ_1; p12=pQ_2;
+  p21=pR_1; p22=pR_2;
+  tmp=-6*p12*p01+3*p12*p21+3*p12*p31+6*p02*p11-
+         10*p02*p01+3*p02*p21+p02*p31-3*p22*p11-
+         3*p22*p01+6*p22*p31-3*p32*p11-p32*p01-
+         6*p32*p21+10*p32*p31;
+  tmp=tmp/20;
+);
+IntegrateO(pltdata,rangeorg):=(
+  regional(tmp,tmp1,tmp2,pdata,va1,va2,list,Bzk,Bzc,range,pmflg,
+    Sm,p0,p1,p2,p3,pQ,pR,cc,p01,p02,p11,p12,p21,p22,p31,p32);
+  if(isstring(pltdata),
+    pdata=parse(pltdata);
+  ,
+    pdata=pltdata;
+  );
+  if(Measuredepth(pdata)==2,pdata=pdata_1);
+  range=rangeorg;
+  pmflg=1;
+  if(range_2<range_1,
+    range=reverse(range);
+    pmflg=-1;
+  );
+  va1=Meetcurve(pdata,range_1,0);
+  va2=Meetcurve(pdata,range_2,0);
+  list=select(pdata,(#_1>range_1 & #_1<range_2));
+  if(length(list)>0,  // 16.09.25
+    if(list_1_1>list_(length(list))_1, //16.11.03
+      list=reverse(list);
+    );
+  );
+  list=apply(list,LLcrd(#)); 
+  list=concat([va1],list);
+  list=concat(list,[va2]);
+  Sm=0;
+  forall(1..(length(list)-1),
+    p1=list_#;
+    p2=list_(#+1);
+    if(#==1 % #==length(list)-1,
+      tmp1=(p1_2+p2_2)*(p2_1-p1_1)/2;
+      Sm=Sm+tmp1;
+    ,
+      p0=list_(#-1);
+      p3=list_(#+2);
+      tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
+      cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
+      pQ=p1+cc*(p2-p0);
+      pR=p2+cc*(p1-p3);
+      p01=p1_1; p02=p1_2;
+      p31=p2_1; p32=p2_2;
+      p11=pQ_1; p12=pQ_2;
+      p21=pR_1; p22=pR_2;
+      tmp1=-6*p12*p01+3*p12*p21+3*p12*p31+6*p02*p11-
+         10*p02*p01+3*p02*p21+p02*p31-3*p22*p11-
+         3*p22*p01+6*p22*p31-3*p32*p11-p32*p01-
+         6*p32*p21+10*p32*p31;
+      tmp1=tmp1/20;
+      Sm=Sm+tmp1;
+    );
+  );
+  if(pmflg==-1,
+    Sm=-Sm;
+  );
+  Sm;
+);
+Measuredepth(list):=( //190423
+  regional(str,nn,tmp,tmp1,tmp2);
+  str=text(list);
+  tmp1=Indexall(str,"[");
+  tmp2=select(tmp1,!contains(tmp1,#+1));
+  nn=tmp2_1;
+  tmp1=substring(str,nn,length(str));
+  tmp=indexof(tmp1,",");
+  tmp1=substring(tmp1,0,tmp-1);
+  if(!ispoint(parse(tmp1)),
+    nn=nn-1;
+  );
+  nn;
+);
+Indexall(str,key):=(
+  regional(rest,out,flg,tmp,tmp1,);
+  out=[];
+  rest=str;
+  flg=0;
+  forall(1..(length(str)),
+    if(flg==0,
+      tmp=indexof(rest,key);
+      if(tmp>0,
+        tmp1=tmp+length(str)-length(rest);
+        out=append(out,tmp1);
+        rest=substring(rest,tmp,length(rest));
+      ,
+        flg=1;
+      );
+    );
+  );
+  out;
+);
+Meetcurve(Crv,Xorg,Yorg):=(
+  regional(Cv,tmp,tmp1,tmp2,X0,Y0,x1,x2,y1,y2,Ylist,Ban,Tate);
+  if(isstring(Crv),Cv=parse(Crv),Cv=Crv);
+  if(Measuredepth(Cv)==2,Cv=Cv_1);
+  Cv=apply(Cv,LLcrd(#));  // 14.12.18
+  while(length(Cv)==1,
+    Cv=Cv_1;
+  );
+  Cv=apply(Cv,Lcrd(#));
+  tmp1=min(apply(Cv,#_1));
+  tmp2=max(apply(Cv,#_1));
+  if(isstring(Xorg),X0=parse(Xorg),X0=Xorg);
+  if(isstring(Yorg),Y0=parse(Yorg),Y0=Yorg);
+  if(X0<tmp1,
+    X0=tmp1;
+  ,
+    if(X0>tmp2,
+      X0=tmp2;
+    );
+  );
+  tmp1=select(
+    1..(length(Cv)-1),Cv_#_1<=X0 & X0<=Cv_(#+1)_1);
+  tmp2=select(
+    1..(length(Cv)-1),Cv_#_1>=X0 & X0>=Cv_(#+1)_1);
+  tmp2=remove(tmp2,common(tmp2,tmp1));
+  Ban=concat(tmp1,tmp2);
+  Tate=select(Ban,
+    abs(Cv_#_1-Cv_(#+1)_1)<=
+       10^(-2)*abs(Cv_#_2-Cv_(#+1)_2)
+  );
+  Ban=remove(Ban,Tate);
+  Ylist=[];
+  forall(Ban,
+    tmp=Cv_#;
+    x1=tmp_1; y1=tmp_2;
+    tmp=Cv_(#+1);
+    x2=tmp_1; y2=tmp_2;
+    tmp=((x2-X0)*y1+(X0-x1)*y2)/(x2-x1);
+    Ylist=append(Ylist,tmp);
+  );
+  forall(Tate,
+    tmp=Cv_#;
+    x1=tmp_1; y1=tmp_2;
+    tmp=Cv_(#+1);
+    x2=tmp_1; y2=tmp_2;
+    tmp1=min([y1,y2]);
+    tmp2=max([y1,y2]);
+    if(Y0<tmp1,
+      tmp=tmp1;
+    ,
+      if(Y0>tmp2,
+        tmp=tmp2;
+      ,
+        tmp=Y0;
+      );
+    );
+    Ylist=append(Ylist,tmp);
+  );
+  tmp=sort(Ylist,abs(#_1-Y0));
+  [X0,tmp_1];
+);
+Dotprod(vec1,vec2):=(
+  regional(v1,v2,tmp);
+  if(ispoint(vec1),v1=vec1.xy,v1=vec1);
+  if(ispoint(vec2),v2=vec2.xy,v2=vec2);
+  v1*v2;
+);
+Integratedt(pltdata,range,options):=(
+  regional(tmp,tmp1,eqL,Rule,pdata,Sm,ptP,ptQ,list,va1,va2);
+  tmp=Divoptions(options);
+  eqL=tmp_5;
+  Rule="o";
+  forall(eqL,
+    if(Toupper(substring(#,0,1))=="R",
+      tmp=indexof(#,"=");
+      Rule=substring(#,tmp,tmp+1); 
+    );
+  );
+  if(Rule=="o",
+    Sm=SCALEY*IntegrateO(pltdata,range); //211125
+  ,
+    if(isstring(pltdata),pdata=parse(pltdata),pdata=pltdata);
+    if(Measuredepth(pdata)==2,pdata=pdata_1);
+    va1=MeetCurve(pdata,range_1,0);
+    va2=MeetCurve(pdata,range_2,0);
+    list=select(pdata,(#_1>range_1 & #_1<range_2));
+    list=apply(list,LLcrd(#));  // 15.09.14
+    list=concat([va1],list);
+    list=concat(list,[va2]);
+    Sm=0;
+    forall(1..(length(list)-1),
+      ptP=list_#;           // 15.09.14
+      ptQ=list_(#+1);
+      Sm=Sm+(ptP_2+ptQ_2)*(ptQ_1-ptP_1)/2;
+    );
+    SCALEY*Sm; //211125
+  );
+);
 Plotdata(name1,func,variable):=Plotdata(name1,func,variable,[]);
 Plotdata(name1,func,variable,options):=(
   regional(Fn,Va,tmp,tmp1,tmp2,eqL,name,Vname,x1,x2,dx,
@@ -1242,289 +1525,6 @@ Norm(v1):=(  // 16.09.01
 );
 Norm(v1,v2):=(
   Norm(v2-v1);
-);
-Measuredepth(list):=( //190423
-  regional(str,nn,tmp,tmp1,tmp2);
-  str=text(list);
-  tmp1=Indexall(str,"[");
-  tmp2=select(tmp1,!contains(tmp1,#+1));
-  nn=tmp2_1;
-  tmp1=substring(str,nn,length(str));
-  tmp=indexof(tmp1,",");
-  tmp1=substring(tmp1,0,tmp-1);
-  if(!ispoint(parse(tmp1)),
-    nn=nn-1;
-  );
-  nn;
-);
-Indexall(str,key):=(
-  regional(rest,out,flg,tmp,tmp1,);
-  out=[];
-  rest=str;
-  flg=0;
-  forall(1..(length(str)),
-    if(flg==0,
-      tmp=indexof(rest,key);
-      if(tmp>0,
-        tmp1=tmp+length(str)-length(rest);
-        out=append(out,tmp1);
-        rest=substring(rest,tmp,length(rest));
-      ,
-        flg=1;
-      );
-    );
-  );
-  out;
-);
-Integrate(Arg1,Arg2):=( //180708from
-  if(isstring(Arg2),
-    Integratefn(Arg1,Arg2,[]);
-  ,
-    Integratedt(Arg1,Arg2,[]);
-  );
-);
-Integrate(Arg1,Arg2,options):=(
-  if(isstring(Arg2),
-    Integratefn(Arg1,Arg2,options);
-  ,
-    Integratedt(Arg1,Arg2,options);
-  );
-);//180708to
-Integratefn(fnstr,rngstr,options):=( //180708from
-  regional(Sm,Lx,Rx,va1,va2,Num,Way,sx,ex,dx,xn,yn,
-     x0,x1,x2,y0,y1,y2,tmp,tmp1,tmp2,eqL,var,range,plt);
-  Num=100;
-  Way="o";
-  tmp=Divoptions(options);
-  eqL=tmp_5;
-  forall(eqL,
-    tmp=Strsplit(#,"=");
-    tmp1=Toupper(substring(tmp_1,0,1));
-    tmp2=tmp_2;
-    if(tmp1=="N",
-      Num=parse(tmp2);
-    );
-    if(tmp1=="R",
-      tmp2=substring(tmp2,0,1);
-    );
-  );
-  tmp=Strsplit(rngstr,"=");
-  var=tmp_1;
-  range=parse(tmp_2);
-  if(Way=="o",
-    sx=range_1;
-    ex=range_2;
-    dx=(ex-sx)/Num;
-    xn=apply(0..Num,sx+#*dx);
-    yn=apply(xn,parse(Assign(fnstr,[var,#]))); //181230
-    plt=apply(1..(Num+1),[xn_#,yn_#]);
-    Sm=IntegrateO(plt,range);
-  );//180708to
-  if(Way=="t",
-    Sm=0;
-    forall(1..Num,
-      Lx=range_1+(range_2-range_1)*(#-1)/Num;
-      Rx=range_1+(range_2-range_1)*#/Num;
-      va1=parse(replace(fnstr,vastr,Textformat(Lx,5)));
-      va2=parse(replace(fnstr,vastr,Textformat(Rx,5)));
-      Sm=Sm+(va1+va2)*(Rx-Lx)/2;
-    );
-  );
-  if(Way=="s",
-    Sm=0;
-    sx=range_1;
-    ex=range_2;
-    dx=(ex-sx)/Num;
-    xn=apply(0..Num,sx+#*dx);
-    yn=apply(xn,parse(replace(fnstr,vastr,Textformat(#,5))));
-    dx=dx/2;
-    repeat(Num,s,
-      x0=xn_s;
-      x1=(xn_s+xn_(s+1))/2;
-      x2=xn_(s+1);
-      y0=yn_s;
-      y1=parse(replace(fnstr,vastr,Textformat(x1,5)));
-      y2=yn_(s+1);
-      Sm=Sm+dx*(y0+4*y1+y2)/3;
-    ); 
-  );
-  SCALEY*Sm; //211125
-);
-IntegrateO(p0org,p1org,p2org,p3org):=(
-  regional(p0,p1,p2,p3,pQ,pR,cc,p01,p02,
-     p11,p12,p21,p22,p31,p32, tmp);
-  if(ispoint(p0org),p0=p0org.xy,p0=p0org);  // 16.03.10
-  if(ispoint(p1org),p1=p1org.xy,p1=p1org); // 16.03.16
-  if(ispoint(p2org),p2=p2org.xy,p2=p2org);
-  if(ispoint(p3org),p3=p3org.xy,p3=p3org);
-  tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
-  cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
-  pQ=p1+cc*(p2-p0);
-  pR=p2+cc*(p1-p3);
-  p01=p1_1; p02=p1_2;
-  p31=p2_1; p32=p2_2;
-  p11=pQ_1; p12=pQ_2;
-  p21=pR_1; p22=pR_2;
-  tmp=-6*p12*p01+3*p12*p21+3*p12*p31+6*p02*p11-
-         10*p02*p01+3*p02*p21+p02*p31-3*p22*p11-
-         3*p22*p01+6*p22*p31-3*p32*p11-p32*p01-
-         6*p32*p21+10*p32*p31;
-  tmp=tmp/20;
-);
-IntegrateO(pltdata,rangeorg):=(
-  regional(tmp,tmp1,tmp2,pdata,va1,va2,list,Bzk,Bzc,range,pmflg,
-    Sm,p0,p1,p2,p3,pQ,pR,cc,p01,p02,p11,p12,p21,p22,p31,p32);
-  if(isstring(pltdata),
-    pdata=parse(pltdata);
-  ,
-    pdata=pltdata;
-  );
-  if(Measuredepth(pdata)==2,pdata=pdata_1);
-  range=rangeorg;
-  pmflg=1;
-  if(range_2<range_1,
-    range=reverse(range);
-    pmflg=-1;
-  );
-  va1=Meetcurve(pdata,range_1,0);
-  va2=Meetcurve(pdata,range_2,0);
-  list=select(pdata,(#_1>range_1 & #_1<range_2));
-  if(length(list)>0,  // 16.09.25
-    if(list_1_1>list_(length(list))_1, //16.11.03
-      list=reverse(list);
-    );
-  );
-  list=apply(list,LLcrd(#)); 
-  list=concat([va1],list);
-  list=concat(list,[va2]);
-  Sm=0;
-  forall(1..(length(list)-1),
-    p1=list_#;
-    p2=list_(#+1);
-    if(#==1 % #==length(list)-1,
-      tmp1=(p1_2+p2_2)*(p2_1-p1_1)/2;
-      Sm=Sm+tmp1;
-    ,
-      p0=list_(#-1);
-      p3=list_(#+2);
-      tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/|p2-p0|/|p3-p1|)/2);
-      cc=4*|p2-p1|/3/(|p2-p0|+|p3-p1|)/tmp;
-      pQ=p1+cc*(p2-p0);
-      pR=p2+cc*(p1-p3);
-      p01=p1_1; p02=p1_2;
-      p31=p2_1; p32=p2_2;
-      p11=pQ_1; p12=pQ_2;
-      p21=pR_1; p22=pR_2;
-      tmp1=-6*p12*p01+3*p12*p21+3*p12*p31+6*p02*p11-
-         10*p02*p01+3*p02*p21+p02*p31-3*p22*p11-
-         3*p22*p01+6*p22*p31-3*p32*p11-p32*p01-
-         6*p32*p21+10*p32*p31;
-      tmp1=tmp1/20;
-      Sm=Sm+tmp1;
-    );
-  );
-  if(pmflg==-1,
-    Sm=-Sm;
-  );
-  Sm;
-);
-Meetcurve(Crv,Xorg,Yorg):=(
-  regional(Cv,tmp,tmp1,tmp2,X0,Y0,x1,x2,y1,y2,Ylist,Ban,Tate);
-  if(isstring(Crv),Cv=parse(Crv),Cv=Crv);
-  if(Measuredepth(Cv)==2,Cv=Cv_1);
-  Cv=apply(Cv,LLcrd(#));  // 14.12.18
-  while(length(Cv)==1,
-    Cv=Cv_1;
-  );
-  Cv=apply(Cv,Lcrd(#));
-  tmp1=min(apply(Cv,#_1));
-  tmp2=max(apply(Cv,#_1));
-  if(isstring(Xorg),X0=parse(Xorg),X0=Xorg);
-  if(isstring(Yorg),Y0=parse(Yorg),Y0=Yorg);
-  if(X0<tmp1,
-    X0=tmp1;
-  ,
-    if(X0>tmp2,
-      X0=tmp2;
-    );
-  );
-  tmp1=select(
-    1..(length(Cv)-1),Cv_#_1<=X0 & X0<=Cv_(#+1)_1);
-  tmp2=select(
-    1..(length(Cv)-1),Cv_#_1>=X0 & X0>=Cv_(#+1)_1);
-  tmp2=remove(tmp2,common(tmp2,tmp1));
-  Ban=concat(tmp1,tmp2);
-  Tate=select(Ban,
-    abs(Cv_#_1-Cv_(#+1)_1)<=
-       10^(-2)*abs(Cv_#_2-Cv_(#+1)_2)
-  );
-  Ban=remove(Ban,Tate);
-  Ylist=[];
-  forall(Ban,
-    tmp=Cv_#;
-    x1=tmp_1; y1=tmp_2;
-    tmp=Cv_(#+1);
-    x2=tmp_1; y2=tmp_2;
-    tmp=((x2-X0)*y1+(X0-x1)*y2)/(x2-x1);
-    Ylist=append(Ylist,tmp);
-  );
-  forall(Tate,
-    tmp=Cv_#;
-    x1=tmp_1; y1=tmp_2;
-    tmp=Cv_(#+1);
-    x2=tmp_1; y2=tmp_2;
-    tmp1=min([y1,y2]);
-    tmp2=max([y1,y2]);
-    if(Y0<tmp1,
-      tmp=tmp1;
-    ,
-      if(Y0>tmp2,
-        tmp=tmp2;
-      ,
-        tmp=Y0;
-      );
-    );
-    Ylist=append(Ylist,tmp);
-  );
-  tmp=sort(Ylist,abs(#_1-Y0));
-  [X0,tmp_1];
-);
-Dotprod(vec1,vec2):=(
-  regional(v1,v2,tmp);
-  if(ispoint(vec1),v1=vec1.xy,v1=vec1);
-  if(ispoint(vec2),v2=vec2.xy,v2=vec2);
-  v1*v2;
-);
-Integratedt(pltdata,range,options):=(
-  regional(tmp,tmp1,eqL,Rule,pdata,Sm,ptP,ptQ,list,va1,va2);
-  tmp=Divoptions(options);
-  eqL=tmp_5;
-  Rule="o";
-  forall(eqL,
-    if(Toupper(substring(#,0,1))=="R",
-      tmp=indexof(#,"=");
-      Rule=substring(#,tmp,tmp+1); 
-    );
-  );
-  if(Rule=="o",
-    Sm=SCALEY*IntegrateO(pltdata,range); //211125
-  ,
-    if(isstring(pltdata),pdata=parse(pltdata),pdata=pltdata);
-    if(Measuredepth(pdata)==2,pdata=pdata_1);
-    va1=MeetCurve(pdata,range_1,0);
-    va2=MeetCurve(pdata,range_2,0);
-    list=select(pdata,(#_1>range_1 & #_1<range_2));
-    list=apply(list,LLcrd(#));  // 15.09.14
-    list=concat([va1],list);
-    list=concat(list,[va2]);
-    Sm=0;
-    forall(1..(length(list)-1),
-      ptP=list_#;           // 15.09.14
-      ptQ=list_(#+1);
-      Sm=Sm+(ptP_2+ptQ_2)*(ptQ_1-ptP_1)/2;
-    );
-    SCALEY*Sm; //211125
-  );
 );
 Windispg():=(
   if(ADDAXES=="1", //181215from
@@ -3500,6 +3500,10 @@ Ketcindyjsscale=1;
 
 Seteditable(10,["","Size=18","Width=100"]);
 Text10.xy=[7.5,5];
+Seteditable(11,["","Size=18","Width=200"]);
+Text11.xy=[7.5,3.5];
+Seteditable(12,["","Size=18","Width=50"]);
+Text12.xy=[7.5,2.4];
 
 ;
 
@@ -3509,10 +3513,17 @@ Ketinit();
 Setketcindyjs(["Label=[]","Color=offwhite"]);
 Setwindow([-5,5],[-5,5]);
 
-str="x";
-str=Textedit(10); //
-Expr([6,5.3],"e","\dfrac{dy}{dx}=");
-Deffun("f1(x)",["regional(y)","y="+str,"y"]);
+str0="x";
+str0=Textedit(10); //
+Expr([7.3,5.3],"w","\dfrac{dy}{dx}=");
+Deffun("f1(x)",["regional(y)","y="+str0,"y"]);
+str1="x^2";
+str1=Textedit(11); //
+Expr([7.3,3.7],"w","y=");
+Expr([13.6,3.7],"e","+C");
+str2="1";
+str2=Textedit(12); //
+Expr([7.3,2.6],"w","C=");
 
 xL=-5..5;
 yL=-5..5;
@@ -3525,16 +3536,13 @@ forall(1..length(yL),j,
 Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
 Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
 
-if(length(str)>0,
+if(length(str0)>0,
   forall(1..length(xL),i,
     forall(1..length(yL),j,
       Arrowdata(text(i)+"0"+text(j),[[xL_i,yL_j],[xL_i,yL_j]+0.5*[1,f1(xL_i)]]);
     );
   );
-);
-
-if(length(str)>0,
-  Plotdata("1",str,"x",["nodisp"]);
+  Plotdata("1",str0,"x",["nodisp"]);
   fL=[];
   forall(1..length(gr1),
     pL=gr1_#;
@@ -3543,6 +3551,10 @@ if(length(str)>0,
     fL=Append(fL,fpL);
   );
   Listplot("f1",fL,["dr,2"]);
+);
+
+if((length(str1)>0)&(length(str2)>0),
+  Plotdata("2",str1+"+"+str2,"x",["dr,2","Color=red"]);
 );
 
 Windispg();
@@ -3565,7 +3577,9 @@ var cdy = CindyJS({
   geometry: [
     {name: "SW", type: "Free", pos: [4.0, 4.0, -0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
     {name: "NE", type: "Free", pos: [4.0, 4.0, 0.8], color: [1.0,1.0,1.0], labeled: false, size: 2.0, border:false },
-    {name: "Text10", type: "EditableText", pos: [4.0, 2.6666666666666665, 0.5333333333333333], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 100, textsize: 18.0}
+    {name: "Text10", type: "EditableText", pos: [4.0, 2.6666666666666665, 0.5333333333333333], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 100, textsize: 18.0},
+    {name: "Text11", type: "EditableText", pos: [4.0, 1.8666666666666667, 0.5333333333333333], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 200, textsize: 18.0},
+    {name: "Text12", type: "EditableText", pos: [4.0, 1.28, 0.5333333333333333], color: [0.0, 0.0, 0.0], fillcolor: [1.0, 1.0, 1.0], fillalpha: 1.0, minwidth: 50, textsize: 18.0}
   ],
   ports: [{
     width: 739,
@@ -3577,6 +3591,7 @@ var cdy = CindyJS({
     background: "rgb(247,247,247)"
   }],
   csconsole: false,
+  use: ["katex"],
   cinderella: {build: 2124, version: [3, 0, 2124]}
 });
     </script>

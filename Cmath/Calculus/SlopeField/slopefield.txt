@@ -6,16 +6,28 @@ import("ketcindy.ini");
 
 Seteditable(10,["","Size=18","Width=100"]);
 Text10.xy=[7.5,5];
+Seteditable(11,["","Size=18","Width=200"]);
+Text11.xy=[7.5,3.5];
+Seteditable(12,["","Size=18","Width=50"]);
+Text12.xy=[7.5,2.4];
+
 
 //////////////// Draw/figures //////////////////
 Ketinit();
 Setketcindyjs(["Label=[]","Color=offwhite"]);
 Setwindow([-5,5],[-5,5]);
 
-str="x";
-//str=Textedit(10); //only ketjs
-Expr([6,5.3],"e","\dfrac{dy}{dx}=");
-Deffun("f1(x)",["regional(y)","y="+str,"y"]);
+str0="x";
+//str0=Textedit(10); //only ketjs
+Expr([7.3,5.3],"w","\dfrac{dy}{dx}=");
+Deffun("f1(x)",["regional(y)","y="+str0,"y"]);
+str1="x^2";
+//str1=Textedit(11); //only ketjs
+Expr([7.3,3.7],"w","y=");
+Expr([13.6,3.7],"e","+C");
+str2="1";
+//str2=Textedit(12); //only ketjs
+Expr([7.3,2.6],"w","C=");
 
 xL=-5..5;
 yL=-5..5;
@@ -28,16 +40,13 @@ forall(1..length(yL),j,
 Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
 Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
 
-if(length(str)>0,
+if(length(str0)>0,
   forall(1..length(xL),i,
     forall(1..length(yL),j,
       Arrowdata(text(i)+"0"+text(j),[[xL_i,yL_j],[xL_i,yL_j]+0.5*[1,f1(xL_i)]]);
     );
   );
-);
-
-if(length(str)>0,
-  Plotdata("1",str,"x",["nodisp"]);
+  Plotdata("1",str0,"x",["nodisp"]);
   fL=[];
   forall(1..length(gr1),
     pL=gr1_#;
@@ -46,6 +55,10 @@ if(length(str)>0,
     fL=Append(fL,fpL);
   );
   Listplot("f1",fL,["dr,2"]);
+);
+
+if((length(str1)>0)&(length(str2)>0),
+  Plotdata("2",str1+"+"+str2,"x",["dr,2","Color=red"]);
 );
 
 Windispg();

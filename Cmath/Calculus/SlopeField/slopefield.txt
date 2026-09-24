@@ -1,0 +1,51 @@
+//////////////// Initialization/KETlib ////////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+
+Seteditable(10,["","Size=18","Width=100"]);
+Text10.xy=[7.5,5];
+
+//////////////// Draw/figures //////////////////
+Ketinit();
+Setketcindyjs(["Label=[]","Color=offwhite"]);
+Setwindow([-5,5],[-5,5]);
+
+str="x";
+//str=Textedit(10); //only ketjs
+Expr([6,5.3],"e","\dfrac{dy}{dx}=");
+Deffun("f1(x)",["regional(y)","y="+str,"y"]);
+
+xL=-5..5;
+yL=-5..5;
+forall(1..length(xL),i,
+  Listplot("dox"+text(i),[[xL_i,YMIN],[xL_i,YMAX]],["do"]);
+);
+forall(1..length(yL),j,
+  Listplot("doy"+text(j),[[XMIN,yL_j],[XMAX,yL_j]],["do"]);
+);
+Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
+Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
+
+if(length(str)>0,
+  forall(1..length(xL),i,
+    forall(1..length(yL),j,
+      Arrowdata(text(i)+"0"+text(j),[[xL_i,yL_j],[xL_i,yL_j]+0.5*[1,f1(xL_i)]]);
+    );
+  );
+);
+
+if(length(str)>0,
+  Plotdata("1",str,"x",["nodisp"]);
+  fL=[];
+  forall(1..length(gr1),
+    pL=gr1_#;
+    mm=Integrate("gr1",[0,pL_1]);
+    fpL=[pL_1,mm];
+    fL=Append(fL,fpL);
+  );
+  Listplot("f1",fL,["dr,2"]);
+);
+
+Windispg();

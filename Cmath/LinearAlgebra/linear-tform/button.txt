@@ -1,0 +1,47 @@
+Dq=unicode("0022");
+
+Ucreate(uc1,uc2,uc3,uc4):=(
+  create([uc1],"Text",[[5,5,1]]);
+  parse(uc1+".text=uc2");
+  parse(uc1+".xy=uc3");
+  parse(uc1+".color=[0,0,0]");
+  inspect(parse(uc1),"colorfill",0);
+  inspect(parse(uc1),"text.minwidth",33);
+  inspect(parse(uc1),"textsize",20);
+  inspect(parse(uc1),"textbutton","true");
+  inspect(parse(uc1),"texttoggle","true");
+  inspect(parse(uc1),"button.script",uc4);
+  inspect(parse(uc1),"fillalpha",0.2);
+);
+
+//Ucreate("Text3","Ketjsoff",[-1.5,5.8],"Mkketcindyjs(append(KETJSOP,"+Dq+"Web=n"+Dq+"));");
+
+Ucreate("Text100","変換図",[12,1],"startflg=1;");
+Ucreate("Text101","リセット",[12,-0.5],"startflg=0;startnew=-1;");
+
+nameL1=[["BS","AC","<",">"]];
+
+nameL2=[
+    ["fr(","7","8","9"],
+    ["sq(","4","5","6"],
+    [")","1","2","3"],
+    [",","0","+","-"]
+];
+a=[6.1,7.3,8.5,9.7];
+b=[1.7,0.5,-0.7,-1.9,-3.1];
+ccc=[
+    ["Delete()","Allclear()","Left()","Right()"],
+    ["fr(","7","8","9"],
+    ["sq(","4","5","6"],
+    [")","1","2","3"],
+    [",","0","+","-"]
+];
+repeat(5,i,
+  repeat(4,j,
+     textstr="Text"+text(i)+text(j);
+	 scriptstr="funflg=1;name="+Dq+ccc_i_j+Dq+";";
+     Ucreate(textstr,"　　",[a_j,b_i],scriptstr);
+     inspect(parse(textsyr),"alpha",0);
+     inspect(parse(textsyr),"fillalpha",0);
+  );
+);

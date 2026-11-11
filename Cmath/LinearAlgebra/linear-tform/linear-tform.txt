@@ -67,6 +67,12 @@ if(Strnq!=Strnow,
 
 Expr([6,3.2],"e","A=",["Size=1.2"]);
 
+if(length(Str)>0,
+  Mm=Totexform(Strnq);
+  MmL=Strsplit(Mm,",");
+  Expr([6,6],"e","A=\left(\begin{array}{cc}"+MmL_1+"&"+MmL_2+"\\"+MmL_3+"&"+MmL_4+"\end{array}\right)",["Size=1.2"]);
+);
+
 ///////////////変換図/////////////
 Htickmark([XMIN,text(XMIN),XMAX,text(XMAX)]);
 Vtickmark([YMIN,text(YMIN),YMAX,text(YMAX)]);
@@ -95,5 +101,3 @@ if(startflg==1,
 );
 
 Windispg();
-
-//Help("Tocindyform");

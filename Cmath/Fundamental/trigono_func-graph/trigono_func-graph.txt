@@ -1,0 +1,90 @@
+///////////////////// Initialization/KETlib ///////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+setdirectory(Dircdy);
+
+funcflg=0;
+
+///////////////////// Draw/figures /////////////////////
+Ketinit(1.5);
+
+Setketcindyjs(["Sc=1","Label=[]","Color=offwhite"]);
+
+////////// xy座標の設定 //////////
+Setwindow([-9,6.5],[-3,3]);
+
+Htickmark([-2*pi,"-2\pi",-3/2*pi,"-\frac{3}{2}\pi",-pi,"-\pi",-pi/2,"-\frac{\pi}{2}",pi/2,"\frac{\pi}{2}",pi,"\pi",3/2*pi,"\frac{3}{2}\pi",2*pi,"2\pi"]);
+Vtickmark([YMIN,text(YMIN),-2,"",-1,"-1",1,"1",2,"",YMAX,text(YMAX)]);
+
+xL=[-2*pi,-3/2*pi,-pi,-pi/2,pi/2,pi,3/2*pi,2*pi];
+forall(1..length(xL),
+  Listplot("da"+text(#),[[xL_#,YMIN],[xL_#,YMAX]],["da"]);
+);
+
+////////// 関数の選択 /////////
+Expr([-8,4.5],"e","y=\sin x",["Size=1.5"]);
+if(funcflg==1,
+  Pointdata("1",[-8.5,4.5],["Size=8","Inside=Color(red)"]);
+);
+
+Expr([-4,4.5],"e","y=\cos x",["Size=1.5"]);
+if(funcflg==2,
+  Pointdata("1",[-4.5,4.5],["Size=8","Inside=Color(red)"]);
+);
+
+Expr([0,4.5],"e","y=\tan x",["Size=1.5"]);
+if(funcflg==3,
+  Pointdata("1",[-0.5,4.5],["Size=8","Inside=Color(red)"]);
+);
+
+println(funcflg);
+
+////////// スライダーの設定 /////////
+Slider("X",[-6.5,-4],[6.5,-4],["Size=3"]);
+inspect(X,"ptsize","7");
+xx=round(X.x);
+Expr(X.xy+[0,-0.2],"s1","x="+text(xx));
+
+////////// 単位円の設定 /////////
+Circledata("1",[[-8,0],1]);
+Listplot("0",[[-8,-1],[-8,1]]);
+Op=[-8,0];
+
+if(funcflg==1,
+  Pp=Op+[cos(xx),sin(xx)];
+  Listplot("1",[Op,Pp],["dr,1.5"]);
+  Pointdata("2",Pp,["Size=3"]);
+);
+
+if(funcflg==2,
+  Pp=Op+[cos(xx+pi/2),sin(xx+pi/2)];
+  Listplot("1",[Op,Pp],["dr,1.5"]);
+  Pointdata("2",Pp,["Size=3"]);
+);
+
+if(funcflg==3,
+  Listplot("01",[[-7,YMIN],[-7,YMAX]]);
+  Pp=Op+[1,tan(xx)];
+  Listplot("1",[Op,Pp],["dr,1.5"]);
+  Pointdata("2",Pp,["Size=3"]);
+);
+
+////////// 表示の設定 //////////
+if(funcflg==1,
+  Plotdata("1","sin(x)","x=[-6.5,xx]",["dr,1.5"]);
+  Listplot("do1",[Pp,[xx,sin(xx)]],["do"]);
+);
+
+if(funcflg==2,
+  Plotdata("1","cos(x)","x=[-6.5,xx]",["dr,1.5"]);
+  Listplot("do1",[Pp,[xx,cos(xx)]],["do"]);
+);
+
+if(funcflg==3,
+  Plotdata("1","tan(x)","x=[-6.5,xx]",["dr,1.5","Num=200","Dis=6"]);
+  Listplot("do1",[Pp,[xx,tan(xx)]],["do"]);
+);
+
+Windispg();

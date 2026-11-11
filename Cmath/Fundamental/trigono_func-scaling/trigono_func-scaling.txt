@@ -1,0 +1,117 @@
+///////////////////// Initialization/KETlib ///////////////
+use("KetCindyPlugin");
+Dircdy=loaddirectory;
+setdirectory(gethome());
+import("ketcindy.ini");
+setdirectory(Dircdy);
+import("ketcindylibkey.cs");
+import("keynamelib.txt");
+//import("ucreate.txt");
+
+funflg=0;
+//create(["Text10"],"EditableText",[[5,5,1]]);
+Seteditable(10,["","Size=18","Width=60"]);
+Text10.xy=[-5.8,6.3];//sinθの入力窓
+Seteditable(11,["","Size=18","Width=60"]);
+Text11.xy=[-2.8,6.3];//sinθの入力窓
+
+Text12.xy=[2,6.3];//「リセット」ボタン
+
+Str1="1";
+Str1now="";
+Str2="1";
+Str2now="";
+rsflg=0;
+
+
+///////////////////// Draw/figures /////////////////////
+Ketinit(1.5);
+
+Setketcindyjs();
+Setwindow([-6.5,6.5],[-5,5]);
+
+/////////////// 入力窓 //////////////
+if(funflg==1,
+  if(contains(Manifun,name),
+    parse(name+";");
+  ,
+    tmp=indexof(Str1,"?");
+    if(tmp>0,npos=tmp,npos=length(Str1));
+    out=Addfunstr(name,npos,Str1);
+    tmp=length(out_1)-length(Str1);
+    npos=npos+tmp;
+    Str=out_1; //npos=out_2;
+    if(npos<length(Str1),
+      tmp=replace(Str1,"?","");
+      tmp1=substring(tmp,0,npos-1)+"?";
+      Str1=tmp1+substring(tmp,npos-1,length(tmp));
+    );
+  );
+  Subsedit(10,Str1);
+  funflg=2;
+  stflg=0;
+);
+if(funflg==2,
+  if(contains(Manifun,name),
+    parse(name+";");
+  ,
+    tmp=indexof(Str2,"?");
+    if(tmp>0,npos=tmp,npos=length(Str2));
+    out=Addfunstr(name,npos,Str2);
+    tmp=length(out_1)-length(Str2);
+    npos=npos+tmp;
+    Str=out_1; //npos=out_2;
+    if(npos<length(Str2),
+      tmp=replace(Str2,"?","");
+      tmp1=substring(tmp,0,npos-1)+"?";
+      Str2=tmp1+substring(tmp,npos-1,length(tmp));
+    );
+  );
+  Subsedit(11,Str2);
+  funflg=0;
+  stflg=0;
+);
+
+Str1=Textedit(10,"","");
+Str1=replace(Str1,"frfr","tfr");
+Str1nq=replace(Str1,"?","");
+if(Str1nq!=Str1now,
+  Str1now=Str1nq;
+);
+Rstr1=Str1nq;
+Rtexstr1=Totexform(Rstr1);
+Rcdystr1=Tocindyform(Rstr1);
+
+Str2=Textedit(11,"","");
+Str2=replace(Str2,"frfr","tfr");
+Str2nq=replace(Str2,"?","");
+if(Str2nq!=Str2now,
+  Str2now=Str2nq;
+);
+Rstr2=Str2nq;
+Rtexstr2=Totexform(Rstr2);
+Rcdystr2=Tocindyform(Rstr2);
+
+//////////// 関数の入力 //////////
+Expr([-7,6.5],"e","y=",["Size=1.5"]);
+Expr([-4,6.5],"e","\sin",["Size=1.5"]);
+Expr([-1,6.5],"e","x",["Size=1.5"]);
+if(length(Rstr)>0,
+  Expr([-7,5],"e","y="+Rtexstr,["Size=1.5"]);
+);
+
+/////////// グラフの表示 //////////
+Plotdata("da0","sin(x)","x",["da"]);
+Htickmark([-2*pi,"-2\pi",-3/2*pi,"-\frac{3}{2}\pi",-pi,"-\pi",-pi/2,"-\frac{\pi}{2}",pi/2,"\frac{\pi}{2}",pi,"\pi",3/2*pi,"\frac{3}{2}\pi",2*pi,"2\pi"]);
+Vtickmark([-5,"-5",-4,"-4",-3,"-3",-2,"-2",-1,"-1",1,"1",2,"2",3,"3",4,"4",5,"5"]);
+xL=[-2*pi,-3/2*pi,-pi,-pi/2,pi/2,pi,3/2*pi,2*pi];
+forall(1..length(xL),
+  Listplot("dax"+text(#),[[xL_#,YMIN],[xL_#,YMAX]],["da"]);
+);
+
+if((length(Str1)>0)&(length(Str2)>0),
+println(Rcdystr1);
+  Plotdata("1",Rcdystr1+"*sin("+Rcdystr2+"*x)","x",["dr,1.5","Num=200"]);
+);
+
+Windispg();

@@ -1,0 +1,16 @@
+Ucreate(uc1):=(
+ create([uc1],"Text",[[5,5,1]]);
+ parse(uc1+".text="　　"");
+// parse(uc1+".xy=uc3");
+ parse(uc1+".color=[0,0,0]");
+// parse(uc1+".fillalpha=0");
+// inspect(parse(uc1),"colorfill",8);
+ inspect(parse(uc1),"colorfill",0);
+ inspect(parse(uc1),"text.minwidth",33);
+ inspect(parse(uc1),"textsize",18);
+ inspect(parse(uc1),"textbutton","true");
+ inspect(parse(uc1),"texttoggle","true");
+// inspect(parse(uc1),"button.script",uc4);
+// inspect(parse(uc1),"alpha",1);
+ inspect(parse(uc1),"fillalpha",0.2);
+);
